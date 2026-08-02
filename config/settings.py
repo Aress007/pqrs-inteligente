@@ -2,7 +2,7 @@
 Configuración del proyecto PQRS-INTELIGENTE
 Django - Proyecto Final SENA Cúcuta 2026
 """
-
+import os
 from pathlib import Path
 
 # Ruta base del proyecto
@@ -12,9 +12,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-2$gb5q@s0u&z4bw^1)!8q5-3%irr_-3=8-kr=b_oivan!#3%c3'
 
 # En producción cambiar a False
-DEBUG = True
+DEBUG = os.environ.get('DEBUG', 'True') == 'True'
 
-ALLOWED_HOSTS = ['localhost', '127.0.0.1']
+ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', 'localhost,127.0.0.1').split(',')
 
 # ===== APLICACIONES INSTALADAS =====
 INSTALLED_APPS = [
