@@ -1,0 +1,108 @@
+{% extends 'core/base.html' %} {% block title %}Iniciar Sesión - PQRS
+Inteligente{% endblock %} {% block breadcrumb %}
+<li class="breadcrumb-item active" aria-current="page">Iniciar Sesión</li>
+{% endblock %} {% block content %}
+<div class="row justify-content-center my-4">
+  <div class="col-md-5 col-lg-4">
+    <div class="text-center mb-4">
+      <i class="bi bi-shield-check text-primary" style="font-size: 3rem"></i>
+      <h1 class="h4 fw-bold mt-2 text-dark">PQRS Inteligente</h1>
+      <p class="text-muted small">Iniciar Sesión — Acceso al sistema</p>
+    </div>
+    <div class="card shadow border-0 rounded-4">
+      <div class="card-body p-4 p-md-5">
+        <h2 class="h5 text-center fw-bold mb-4">
+          <i class="bi bi-person-circle me-2"></i>Iniciar Sesión
+        </h2>
+        <form method="POST" action="{% url 'usuarios:login' %}">
+          {% csrf_token %}
+          <div class="mb-3">
+            <label class="form-label fw-semibold">Nombre de Usuario</label>
+            <input
+              type="text"
+              name="username"
+              class="form-control form-control-lg"
+              placeholder="Ingrese su usuario"
+              autocomplete="username"
+              required
+            />
+            <div class="form-text">
+              Su nombre de usuario registrado en el sistema.
+            </div>
+          </div>
+          <div class="mb-4">
+            <label class="form-label fw-semibold">Contraseña</label>
+            <div class="input-group">
+              <input
+                type="password"
+                name="password"
+                id="password"
+                class="form-control form-control-lg"
+                placeholder="Ingrese su contraseña"
+                autocomplete="current-password"
+                required
+              />
+              <button
+                class="btn btn-outline-secondary"
+                type="button"
+                id="togglePassword"
+                aria-label="Mostrar contraseña"
+              >
+                <i class="bi bi-eye" id="iconoOjo"></i>
+              </button>
+            </div>
+          </div>
+          <div class="d-grid mb-3">
+            <button
+              type="submit"
+              class="btn btn-primary btn-lg fw-bold rounded-3"
+            >
+              Ingresar
+            </button>
+          </div>
+          <div class="text-center mb-2">
+            <a
+              href="{% url 'password_reset' %}"
+              class="text-decoration-none text-muted small"
+            >
+              <i class="bi bi-question-circle me-1"></i>¿Olvidaste tu
+              contraseña?
+            </a>
+          </div>
+          <hr class="my-3" />
+          <div class="text-center">
+            <span class="text-muted small">¿No tienes cuenta?</span>
+            <a
+              href="{% url 'usuarios:registro_unificado' %}"
+              class="text-decoration-none fw-bold text-primary ms-1"
+              >Regístrate aquí</a
+            >
+          </div>
+        </form>
+      </div>
+    </div>
+    <p class="text-center text-muted small mt-3">
+      <i class="bi bi-shield-lock me-1"></i>Tus datos están protegidos bajo la
+      Ley 1581 de 2012.
+    </p>
+  </div>
+</div>
+
+<script>
+  document
+    .getElementById("togglePassword")
+    ?.addEventListener("click", function () {
+      const campo = document.getElementById("password");
+      const icono = document.getElementById("iconoOjo");
+      if (campo.type === "password") {
+        campo.type = "text";
+        icono.classList.remove("bi-eye");
+        icono.classList.add("bi-eye-slash");
+      } else {
+        campo.type = "password";
+        icono.classList.remove("bi-eye-slash");
+        icono.classList.add("bi-eye");
+      }
+    });
+</script>
+{% endblock %}

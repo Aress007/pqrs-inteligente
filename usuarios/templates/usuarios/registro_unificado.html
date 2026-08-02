@@ -1,0 +1,120 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Registro - PQRS Inteligente{% endblock %}
+
+{% block breadcrumb %}
+    <li class="breadcrumb-item active">Registro</li>
+{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card shadow border-0 rounded-4">
+            <div class="card-header bg-primary text-white rounded-top-4 py-3">
+                <h2 class="h4 mb-0 fw-bold">Registro de Usuario</h2>
+                <small>Crea tu cuenta para comenzar</small>
+            </div>
+            <div class="card-body p-4">
+                <form method="POST" id="registroForm">
+                    {% csrf_token %}
+                    
+                    <h5 class="fw-bold text-primary mb-3">Datos personales</h5>
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Usuario *</label>
+                            {{ form.username }}
+                            {{ form.username.errors }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Correo electrónico *</label>
+                            {{ form.email }}
+                            {{ form.email.errors }}
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Contraseña *</label>
+                            {{ form.password }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Confirmar contraseña *</label>
+                            {{ form.password2 }}
+                            {{ form.password2.errors }}
+                        </div>
+                    </div>
+                    <div class="mb-4">
+                        <label class="form-label">Teléfono</label>
+                        {{ form.telefono }}
+                    </div>
+
+                    <div class="mb-4 form-check">
+                        {{ form.es_empresa }}
+                        <label class="form-check-label fw-bold" for="{{ form.es_empresa.id_for_label }}">
+                            ¿Registrarse como empresa?
+                        </label>
+                        <div class="form-text">Si es una empresa, marque esta casilla para registrar los datos del negocio.</div>
+                    </div>
+
+                    <!-- Campos de empresa (ocultos inicialmente) -->
+                    <div id="empresaFields" style="display: none;">
+                        <hr>
+                        <h5 class="fw-bold text-primary mb-3">Datos de la empresa</h5>
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Nombre de la empresa *</label>
+                                {{ form.nombre_empresa }}
+                                {{ form.nombre_empresa.errors }}
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">NIT *</label>
+                                {{ form.nit }}
+                                {{ form.nit.errors }}
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Dirección</label>
+                            {{ form.direccion }}
+                        </div>
+                        <div class="mb-4">
+                            <label class="form-label">Plan de suscripción *</label>
+                            {{ form.plan }}
+                            {{ form.plan.errors }}
+                        </div>
+                    </div>
+
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-success btn-lg fw-bold">Registrarse</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <p class="text-center text-muted small mt-3">
+            ¿Ya tienes cuenta? <a href="{% url 'usuarios:login' %}">Inicia sesión aquí</a>
+        </p>
+    </div>
+</div>
+
+<script>
+    const esEmpresaCheck = document.getElementById('{{ form.es_empresa.id_for_label }}');
+    const empresaFields = document.getElementById('empresaFields');
+    
+    function toggleEmpresaFields() {
+        if (esEmpresaCheck.checked) {
+            empresaFields.style.display = 'block';
+            document.querySelector('input[name="nombre_empresa"]').required = true;
+            document.querySelector('input[name="nit"]').required = true;
+            document.querySelector('select[name="plan"]').required = true;
+        } else {
+            empresaFields.style.display = 'none';
+            document.querySelector('input[name="nombre_empresa"]').required = false;
+            document.querySelector('input[name="nit"]').required = false;
+            document.querySelector('select[name="plan"]').required = false;
+        }
+    }
+    
+    if (esEmpresaCheck) {
+        esEmpresaCheck.addEventListener('change', toggleEmpresaFields);
+        toggleEmpresaFields();
+    }
+</script>
+{% endblock %}

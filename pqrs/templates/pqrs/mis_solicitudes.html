@@ -1,0 +1,45 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Mis Solicitudes{% endblock %}
+
+{% block breadcrumb %}
+    <li class="breadcrumb-item active">Mis Solicitudes</li>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="h3">Mis Solicitudes</h1>
+        <a href="{% url 'pqrs:crear' %}" class="btn btn-primary">Nueva PQRS</a>
+    </div>
+    <div class="row g-4 mb-5">
+        <div class="col-md-3"><div class="card"><div class="card-body"><h5>Total</h5><h2>{{ total }}</h2></div></div></div>
+        <div class="col-md-3"><div class="card"><div class="card-body"><h5>Pendientes</h5><h2>{{ pendientes }}</h2></div></div></div>
+        <div class="col-md-3"><div class="card"><div class="card-body"><h5>En Proceso</h5><h2>{{ en_proceso }}</h2></div></div></div>
+        <div class="col-md-3"><div class="card"><div class="card-body"><h5>Resueltas</h5><h2>{{ resueltas }}</h2></div></div></div>
+    </div>
+    <div class="card">
+        <div class="card-header">Mis PQRS radicadas</div>
+        <div class="card-body">
+            {% if pqrs_lista %}
+                <table class="table">
+                    <thead><tr><th>Radicado</th><th>Asunto</th><th>Estado</th><th>Fecha</th><th>Acciones</th></tr></thead>
+                    <tbody>
+                        {% for p in pqrs_lista %}
+                        <tr>
+                            <td>{{ p.codigo_radicado }}</td>
+                            <td>{{ p.asunto }}</td>
+                            <td>{% if p.estado == 'Pendiente' %}<span class="badge bg-warning">Pendiente</span>{% elif p.estado == 'En Proceso' %}<span class="badge bg-info">En Proceso</span>{% else %}<span class="badge bg-success">Resuelta</span>{% endif %}</td>
+                            <td>{{ p.fecha_creacion|date:"d/m/Y" }}</td>
+                            <td><a href="{% url 'pqrs:detalle' p.id %}" class="btn btn-sm btn-primary">Ver</a></td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            {% else %}
+                <p>No has radicado ninguna PQRS.</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

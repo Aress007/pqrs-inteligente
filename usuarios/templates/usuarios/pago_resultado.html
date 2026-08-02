@@ -1,0 +1,26 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Resultado del Pago{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="card shadow">
+        <div class="card-header {% if resultado == 'Aceptado' %}bg-success{% else %}bg-danger{% endif %} text-white">
+            <h2 class="h4 mb-0">Resultado del Pago</h2>
+        </div>
+        <div class="card-body">
+            <p><strong>Estado:</strong> 
+                {% if resultado == 'Aceptado' %}
+                    <span class="badge bg-success">Aceptado</span>
+                {% else %}
+                    <span class="badge bg-danger">Rechazado</span>
+                {% endif %}
+            </p>
+            <p><strong>Referencia:</strong> {{ ref_payco }}</p>
+            <p><strong>Mensaje:</strong> {{ mensaje }}</p>
+            <p><strong>Código transacción:</strong> {{ cod_transaccion }}</p>
+            <a href="{% url 'core:inicio' %}" class="btn btn-primary">Volver al inicio</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

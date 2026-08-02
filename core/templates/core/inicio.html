@@ -1,0 +1,96 @@
+{% extends 'core/base.html' %}
+
+{% block title %}PQRS Inteligente - Gestión de PQRS con IA{% endblock %}
+
+{% block breadcrumb %}{% endblock %}
+
+{% block content %}
+<div class="row align-items-center justify-content-between mb-5 pb-3">
+    <div class="col-lg-6">
+        <h1 class="display-5 fw-bold text-primary">Gestión Inteligente de PQRS para tu Negocio</h1>
+        <p class="lead mt-3">
+            Sistema SaaS con clasificación automática por Inteligencia Artificial. 
+            Optimiza la atención de Peticiones, Quejas, Reclamos y Sugerencias.
+        </p>
+
+        <div class="mt-4">
+            <a href="{% url 'usuarios:registro_unificado' %}" class="btn btn-primary btn-lg me-2">
+                <i class="bi bi-rocket-takeoff me-2"></i>Comenzar Gratis
+            </a>
+            <a href="{% url 'usuarios:login' %}" class="btn btn-outline-secondary btn-lg">
+                <i class="bi bi-box-arrow-in-right me-2"></i>Ya tengo cuenta
+            </a>
+        </div>
+    </div>
+
+    <div class="col-lg-5 d-none d-lg-block text-center">
+        <i class="bi bi-robot display-1 text-info"></i>
+        <i class="bi bi-bar-chart-steps display-1 text-secondary ms-3"></i>
+    </div>
+</div>
+
+<div class="row text-center mb-5 py-4 bg-light rounded-4">
+    <div class="col-md-4">
+        <i class="bi bi-cpu fs-1 text-primary"></i>
+        <h3 class="h5 mt-2">Clasificación IA</h3>
+        <p>Clasifica automáticamente Peticiones, Quejas, Reclamos y Sugerencias.</p>
+    </div>
+    <div class="col-md-4">
+        <i class="bi bi-speedometer2 fs-1 text-primary"></i>
+        <h3 class="h5 mt-2">Dashboard en Tiempo Real</h3>
+        <p>Métricas y estado de todas las PQRS de tu empresa.</p>
+    </div>
+    <div class="col-md-4">
+        <i class="bi bi-shield-lock fs-1 text-primary"></i>
+        <h3 class="h5 mt-2">Seguro y Legal</h3>
+        <p>Cumplimos con la Ley 1581 de 2012. Tus datos protegidos.</p>
+    </div>
+</div>
+
+<h2 class="text-center fw-bold mb-4">Planes para tu Empresa</h2>
+
+<div class="row justify-content-center g-4">
+    <div class="col-md-5 col-lg-4">
+        <div class="card h-100 shadow-sm border-0 rounded-4">
+            <div class="card-header bg-white text-center pt-4 border-0">
+                <h3 class="fw-bold">BÁSICO</h3>
+                <p class="display-6 fw-bold text-primary">Gratis</p>
+            </div>
+            <div class="card-body">
+                <ul class="list-unstyled">
+                    <li><i class="bi bi-check-circle-fill text-success me-2"></i> 1 Usuario</li>
+                    <li><i class="bi bi-check-circle-fill text-success me-2"></i> 50 PQRS/mes</li>
+                    <li><i class="bi bi-check-circle-fill text-success me-2"></i> Dashboard Básico</li>
+                </ul>
+            </div>
+            <div class="card-footer bg-white border-0 text-center pb-4">
+                <a href="{% url 'usuarios:registro_unificado' %}" class="btn btn-outline-primary w-100">
+                    Seleccionar
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-5 col-lg-4">
+        <div class="card h-100 shadow-sm border-primary border-2 rounded-4">
+            <div class="card-header bg-primary text-white text-center pt-4 border-0 rounded-top-4">
+                <h3 class="fw-bold">EMPRESA</h3>
+                <p class="display-6 fw-bold">$29.900 <small class="fs-6">/mes</small></p>
+            </div>
+            <div class="card-body">
+                <ul class="list-unstyled">
+                    <li><i class="bi bi-check-circle-fill text-success me-2"></i> Usuarios Ilimitados</li>
+                    <li><i class="bi bi-check-circle-fill text-success me-2"></i> PQRS Ilimitadas</li>
+                    <li><i class="bi bi-check-circle-fill text-success me-2"></i> Reportes Avanzados</li>
+                </ul>
+            </div>
+            <div class="card-footer bg-white border-0 text-center pb-4">
+                <!-- Botón de pago con ePayco (sandbox) -->
+                <a href="{% url 'usuarios:iniciar_pago_epayco' plan_id=2 %}" class="btn btn-success w-100">
+                    <i class="bi bi-credit-card me-2"></i> Pagar con ePayco (PSE)
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

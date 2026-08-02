@@ -1,0 +1,48 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Pagar con ePayco{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="card shadow">
+        <div class="card-header bg-primary text-white">
+            <h2 class="h4 mb-0">Pagar con ePayco</h2>
+        </div>
+        <div class="card-body text-center">
+            <p class="lead">Estás a punto de pagar el plan <strong>{{ plan.nombre_plan }}</strong></p>
+            <p class="h3 text-primary">${{ plan.precio }}</p>
+            <p class="text-muted">Haz clic en el botón para continuar con el pago en la pasarela de ePayco</p>
+
+            <!-- ============================================================
+            WEB CHECKOUT DE EPAYCO (SEGÚN DOCUMENTACIÓN)
+            ============================================================ -->
+            <form id="epaycoForm">
+                <!-- Los datos se pasan como atributos data-* al botón -->
+                <script
+                    src="https://checkout.epayco.co/checkout.js"
+                    class="epayco-button"
+                    data-epayco-key="{{ public_key }}"
+                    data-epayco-amount="{{ plan.precio|stringformat:'d' }}"
+                    data-epayco-name="Plan {{ plan.nombre_plan }}"
+                    data-epayco-description="Suscripción a {{ plan.nombre_plan }} - PQRS Inteligente"
+                    data-epayco-currency="cop"
+                    data-epayco-country="co"
+                    data-epayco-test="true"
+                    data-epayco-external="false"
+                    data-epayco-response="{{ url_response }}"
+                    data-epayco-confirmation="{{ url_confirmation }}"
+                    data-epayco-method_confirmation="POST"
+                    data-epayco-reference="{{ reference }}"
+                    data-epayco-email="{{ email }}"
+                >
+                </script>
+            </form>
+
+            <p class="mt-3 text-muted small">
+                <i class="bi bi-shield-lock me-1"></i>
+                Tus datos están protegidos. Esta es una transacción de prueba (sandbox).
+            </p>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,92 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Crear PQRS - PQRS Inteligente{% endblock %}
+
+{% block breadcrumb %}
+    <li class="breadcrumb-item">
+        {% if user.perfil.rol == 'empresa' %}
+            <a href="{% url 'pqrs:dashboard' %}">Panel de Control</a>
+        {% else %}
+            <a href="{% url 'pqrs:mis_solicitudes' %}">Mis Solicitudes</a>
+        {% endif %}
+    </li>
+    <li class="breadcrumb-item active">Registrar Nueva Solicitud</li>
+{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8 col-lg-7">
+        <div class="card shadow border-0 rounded-4">
+            <div class="card-header bg-primary text-white rounded-top-4 py-3">
+                <h1 class="h4 mb-0 fw-bold">
+                    <i class="bi bi-pencil-square me-2"></i> PQRS Inteligente
+                </h1>
+                <small>Complete el formulario. El sistema clasificará su solicitud automáticamente con IA.</small>
+            </div>
+            <div class="card-body p-4">
+                <div class="alert alert-info d-flex align-items-center mb-4">
+                    <i class="bi bi-robot me-2 fs-5"></i>
+                    <span>La IA <strong>Hugging Face</strong> clasificará su solicitud.</span>
+                </div>
+
+                <form method="POST" id="formPQRS" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label for="titulo" class="form-label fw-semibold">Asunto *</label>
+                        <input type="text" name="titulo" id="titulo" class="form-control" maxlength="200" required>
+                    </div>
+
+                    {% if not es_cliente %}
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Empresa destino *</label>
+                            <select name="empresa" class="form-select" required>
+                                {% for e in empresas %}
+                                    <option value="{{ e.id }}" selected>{{ e.nombre_empresa }}</option>
+                                {% endfor %}
+                            </select>
+                            <div class="form-text">Solo puedes crear PQRS para tu propia empresa.</div>
+                        </div>
+                    {% else %}
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Seleccione la empresa a la que dirige su PQRS *</label>
+                            <select name="empresa" class="form-select" required>
+                                <option value="">-- Elija una empresa --</option>
+                                {% for e in empresas %}
+                                    <option value="{{ e.id }}">{{ e.nombre_empresa }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    {% endif %}
+
+                    <div class="mb-3">
+                        <label for="descripcion" class="form-label fw-semibold">Descripción *</label>
+                        <textarea name="descripcion" id="descripcion" class="form-control" rows="5" required></textarea>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="archivo" class="form-label">Archivo adjunto (opcional)</label>
+                        <input type="file" name="archivo" id="archivo" class="form-control" accept="image/*,application/pdf,.doc,.docx,.txt">
+                    </div>
+
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-success btn-lg fw-bold" id="btnEnviar">
+                            <i class="bi bi-send-fill me-2"></i> Enviar Solicitud
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    const form = document.getElementById('formPQRS');
+    const btn = document.getElementById('btnEnviar');
+    form.addEventListener('submit', function() {
+        btn.disabled = true;
+        btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span> Procesando...';
+    });
+</script>
+{% endblock %}

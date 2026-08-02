@@ -1,0 +1,51 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Editar Perfil - PQRS Inteligente{% endblock %}
+
+{% block breadcrumb %}
+    <li class="breadcrumb-item active">Editar Perfil</li>
+{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card shadow border-0 rounded-4">
+            <div class="card-header bg-primary text-white rounded-top-4 py-3">
+                <h2 class="h4 mb-0 fw-bold">
+                    <i class="bi bi-person-circle me-2"></i> Editar Perfil
+                </h2>
+                <small>Actualiza tus datos personales</small>
+            </div>
+            <div class="card-body p-4">
+                <form method="POST">
+                    {% csrf_token %}
+                    <h5 class="fw-bold text-primary mb-3">Datos de la cuenta</h5>
+                    <div class="mb-3">
+                        <label class="form-label">Nombre de usuario</label>
+                        {{ user_form.username }}
+                        {{ user_form.username.errors }}
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Correo electrónico</label>
+                        {{ user_form.email }}
+                        {{ user_form.email.errors }}
+                    </div>
+                    <div class="mb-4">
+                        <label class="form-label">Teléfono</label>
+                        {{ telefono_form.telefono }}
+                        {{ telefono_form.telefono.errors }}
+                    </div>
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-success btn-lg fw-bold">
+                            <i class="bi bi-save me-2"></i> Guardar cambios
+                        </button>
+                        <a href="{% url 'usuarios:cambiar_password' %}" class="btn btn-outline-primary">
+                            <i class="bi bi-key me-2"></i> Cambiar contraseña
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,33 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Editar Respuesta{% endblock %}
+
+{% block breadcrumb %}
+    <li class="breadcrumb-item"><a href="{% url 'pqrs:detalle' respuesta.id_pqrs.id %}">Detalle PQRS</a></li>
+    <li class="breadcrumb-item active">Editar Respuesta</li>
+{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card shadow">
+            <div class="card-header bg-primary text-white">
+                <h2 class="h5 mb-0">Editar Respuesta</h2>
+            </div>
+            <div class="card-body">
+                <form method="POST">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label class="form-label">Texto de la respuesta</label>
+                        <textarea name="texto_respuesta" rows="5" class="form-control" required>{{ respuesta.texto_respuesta }}</textarea>
+                    </div>
+                    <div class="d-flex justify-content-between">
+                        <a href="{% url 'pqrs:detalle' respuesta.id_pqrs.id %}" class="btn btn-secondary">Cancelar</a>
+                        <button type="submit" class="btn btn-primary">Guardar cambios</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

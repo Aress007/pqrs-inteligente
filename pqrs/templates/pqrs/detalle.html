@@ -1,0 +1,112 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Detalle PQRS{% endblock %}
+
+{% block breadcrumb %}
+    <li class="breadcrumb-item"><a href="{% if user.perfil.rol == 'empresa' %}{% url 'pqrs:dashboard' %}{% else %}{% url 'pqrs:mis_solicitudes' %}{% endif %}">Mis Solicitudes</a></li>
+    <li class="breadcrumb-item active">Detalle</li>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+<div class="mb-3">
+    <a href="{% if user.perfil.rol == 'empresa' %}{% url 'pqrs:dashboard' %}{% else %}{% url 'pqrs:mis_solicitudes' %}{% endif %}" class="btn btn-secondary">
+        <i class="bi bi-arrow-left"></i> Volver
+    </a>
+</div>
+
+    <div class="card mb-4">
+        <div class="card-header">
+            <strong>{{ pqrs.codigo_radicado }}</strong> - {{ pqrs.asunto }}
+        </div>
+        <div class="card-body">
+            <p><strong>Descripción:</strong> {{ pqrs.descripcion }}</p>
+            <p><strong>Tipo IA:</strong> {{ pqrs.tipo_detectado|capfirst }}</p>
+            <p><strong>Estado:</strong> 
+                <span class="badge {% if pqrs.estado == 'Pendiente' %}bg-warning{% elif pqrs.estado == 'En Proceso' %}bg-info{% else %}bg-success{% endif %}">
+                    {{ pqrs.estado }}
+                </span>
+            </p>
+            <p><strong>Fecha:</strong> {{ pqrs.fecha_creacion|date:"d/m/Y H:i" }}</p>
+            {% if pqrs.archivo %}
+                <p><strong>Archivo adjunto:</strong>
+                    <a href="{{ pqrs.archivo.url }}" target="_blank" class="btn btn-sm btn-outline-primary">Ver</a>
+                    <a href="{% url 'pqrs:descargar_archivo' pqrs.id %}" class="btn btn-sm btn-outline-success">Descargar</a>
+                </p>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="card mb-4">
+        <div class="card-header">Respuestas</div>
+        <div class="card-body">
+            {% if respuestas %}
+                {% for r in respuestas %}
+                    <div class="border-bottom mb-3 pb-2">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <strong>{{ r.id_usuario_responde.username }}</strong> - {{ r.fecha_respuesta|date:"d/m/Y H:i" }}
+                            </div>
+                            {% if user == r.id_usuario_responde %}
+                                <div>
+                                    <a href="{% url 'pqrs:editar_respuesta' r.id %}" class="btn btn-sm btn-outline-primary">
+                                        <i class="bi bi-pencil"></i> Editar
+                                    </a>
+                                    <button type="button" class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#modalEliminar{{ r.id }}">
+                                        <i class="bi bi-trash"></i> Eliminar
+                                    </button>
+                                </div>
+                            {% endif %}
+                        </div>
+                        <p class="mt-2">{{ r.texto_respuesta|linebreaks }}</p>
+                    </div>
+
+                    <!-- Modal de confirmación para eliminar -->
+                    <div class="modal fade" id="modalEliminar{{ r.id }}" tabindex="-1" aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title">Confirmar eliminación</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                                </div>
+                                <div class="modal-body">
+                                    ¿Estás seguro de que deseas eliminar esta respuesta? Esta acción no se puede deshacer.
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                                    <form method="POST" action="{% url 'pqrs:eliminar_respuesta' r.id %}" style="display:inline;">
+                                        {% csrf_token %}
+                                        <button type="submit" class="btn btn-danger">Eliminar</button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <p>No hay respuestas aún.</p>
+            {% endif %}
+        </div>
+    </div>
+
+    {% if user.perfil.rol == 'empresa' or pqrs.id_usuario_creador == user %}
+    <div class="card">
+        <div class="card-header">Agregar respuesta</div>
+        <div class="card-body">
+            <form method="POST">
+                {% csrf_token %}
+                <textarea name="respuesta" rows="3" class="form-control mb-2" placeholder="Escribe tu respuesta..."></textarea>
+                {% if user.perfil.rol == 'empresa' %}
+                    <select name="estado" class="form-select mb-2">
+                        <option value="Pendiente">Pendiente</option>
+                        <option value="En Proceso">En Proceso</option>
+                        <option value="Resuelta">Resuelta</option>
+                    </select>
+                {% endif %}
+                <button type="submit" class="btn btn-success">Enviar respuesta</button>
+            </form>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
