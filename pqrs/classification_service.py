@@ -12,8 +12,10 @@ _MAPEO = None
 def _cargar_modelo():
     global _classifier, _LABELS, _MAPEO
     
-    if _classifier is not None:
-        return
+    if _classifier is not None: None
+    #return
+    print("[INFO] Usando clasificador por palabras clave (modo liviano)")
+
     
     try:
         print("[INFO] Cargando modelo de Hugging Face (puede tomar unos segundos la primera vez)...")
