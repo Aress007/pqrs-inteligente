@@ -31,3 +31,14 @@ class RespuestaPqrs(models.Model):
 
     def __str__(self):
         return f"Respuesta a {self.id_pqrs.codigo_radicado}"
+    
+class HistorialPQRS(models.Model):
+    pqrs = models.ForeignKey('Pqrs', on_delete=models.CASCADE, related_name='historial')
+    usuario = models.ForeignKey(User, on_delete=models.CASCADE)
+    estado_anterior = models.CharField(max_length=30, blank=True, null=True)
+    estado_nuevo = models.CharField(max_length=30)
+    comentario = models.TextField(blank=True, null=True)
+    fecha = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.pqrs.codigo_radicado} - {self.estado_nuevo} - {self.fecha}"

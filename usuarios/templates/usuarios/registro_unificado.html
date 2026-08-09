@@ -21,6 +21,20 @@
                     <h5 class="fw-bold text-primary mb-3">Datos personales</h5>
                     <div class="row mb-3">
                         <div class="col-md-6">
+                            <label class="form-label">Nombres</label>
+                            {{ form.nombres }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Apellidos</label>
+                            {{ form.apellidos }}
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Cédula</label>
+                        {{ form.cedula }}
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-6">
                             <label class="form-label">Usuario *</label>
                             {{ form.username }}
                             {{ form.username.errors }}

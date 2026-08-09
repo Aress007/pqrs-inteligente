@@ -1,0 +1,159 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Ayuda - PQRS Inteligente{% endblock %}
+
+{% block breadcrumb %}
+    <li class="breadcrumb-item active">Ayuda / Manual de Usuario</li>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1 class="h3 fw-bold mb-4">Manual de Usuario - PQRS Inteligente</h1>
+
+    <div class="accordion" id="accordionAyuda">
+        <!-- 1. Registro -->
+        <div class="accordion-item">
+            <h2 class="accordion-header">
+                <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapse1">
+                    <i class="bi bi-person-plus me-2"></i> 1. ¿Cómo registrarse?
+                </button>
+            </h2>
+            <div id="collapse1" class="accordion-collapse collapse show" data-bs-parent="#accordionAyuda">
+                <div class="accordion-body">
+                    <p>Para registrarse en el sistema:</p>
+                    <ol>
+                        <li>Ve a la página principal y haz clic en <strong>"Regístrate"</strong>.</li>
+                        <li>Completa tus datos personales (usuario, correo, contraseña, teléfono).</li>
+                        <li>Si eres una <strong>empresa</strong>, marca la casilla "Registrarse como empresa" y completa los datos adicionales (nombre, NIT, plan).</li>
+                        <li>Si eres un <strong>cliente</strong>, no marques la casilla.</li>
+                        <li>Haz clic en <strong>"Registrarse"</strong>.</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+
+        <!-- 2. Iniciar sesión -->
+        <div class="accordion-item">
+            <h2 class="accordion-header">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse2">
+                    <i class="bi bi-box-arrow-in-right me-2"></i> 2. ¿Cómo iniciar sesión?
+                </button>
+            </h2>
+            <div id="collapse2" class="accordion-collapse collapse" data-bs-parent="#accordionAyuda">
+                <div class="accordion-body">
+                    <ol>
+                        <li>Ve a la página de <strong>Iniciar Sesión</strong>.</li>
+                        <li>Ingresa tu <strong>nombre de usuario</strong> y <strong>contraseña</strong>.</li>
+                        <li>Haz clic en <strong>"Ingresar"</strong>.</li>
+                    </ol>
+                    <p>Si olvidaste tu contraseña, haz clic en <strong>"¿Olvidaste tu contraseña?"</strong> y sigue las instrucciones.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 3. Crear PQRS (cliente) -->
+        <div class="accordion-item">
+            <h2 class="accordion-header">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse3">
+                    <i class="bi bi-pencil-square me-2"></i> 3. ¿Cómo crear una PQRS? (cliente)
+                </button>
+            </h2>
+            <div id="collapse3" class="accordion-collapse collapse" data-bs-parent="#accordionAyuda">
+                <div class="accordion-body">
+                    <ol>
+                        <li>Inicia sesión como <strong>cliente</strong>.</li>
+                        <li>Ve a <strong>"Mis Solicitudes"</strong> y haz clic en <strong>"Nueva PQRS"</strong>.</li>
+                        <li>Completa el formulario: <strong>asunto</strong>, <strong>descripción</strong> y selecciona la <strong>empresa destino</strong>.</li>
+                        <li>Opcionalmente, adjunta un archivo.</li>
+                        <li>Haz clic en <strong>"Enviar Solicitud"</strong>.</li>
+                        <li>El sistema clasificará automáticamente tu PQRS con IA.</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+
+        <!-- 4. Gestionar PQRS (empresa) -->
+        <div class="accordion-item">
+            <h2 class="accordion-header">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse4">
+                    <i class="bi bi-speedometer2 me-2"></i> 4. ¿Cómo gestionar PQRS? (empresa)
+                </button>
+            </h2>
+            <div id="collapse4" class="accordion-collapse collapse" data-bs-parent="#accordionAyuda">
+                <div class="accordion-body">
+                    <ol>
+                        <li>Inicia sesión como <strong>empresa</strong>.</li>
+                        <li>Ve al <strong>Dashboard</strong> para ver todas las PQRS recibidas.</li>
+                        <li>Puedes <strong>filtrar</strong> por estado o buscar por radicado/asunto.</li>
+                        <li>Haz clic en <strong>"Gestionar"</strong> para ver el detalle de una PQRS.</li>
+                        <li>En el detalle, puedes <strong>responder</strong> y <strong>cambiar el estado</strong> (Pendiente, En Proceso, Resuelta).</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+
+        <!-- 5. Editar perfil -->
+        <div class="accordion-item">
+            <h2 class="accordion-header">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse5">
+                    <i class="bi bi-person-gear me-2"></i> 5. ¿Cómo editar mi perfil?
+                </button>
+            </h2>
+            <div id="collapse5" class="accordion-collapse collapse" data-bs-parent="#accordionAyuda">
+                <div class="accordion-body">
+                    <ol>
+                        <li>Inicia sesión.</li>
+                        <li>Haz clic en tu nombre de usuario (arriba a la derecha).</li>
+                        <li>Selecciona <strong>"Mi perfil"</strong>.</li>
+                        <li>Actualiza tus datos y haz clic en <strong>"Guardar cambios"</strong>.</li>
+                        <li>Para cambiar tu contraseña, haz clic en <strong>"Cambiar contraseña"</strong>.</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+
+        <!-- 6. Recuperar contraseña -->
+        <div class="accordion-item">
+            <h2 class="accordion-header">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse6">
+                    <i class="bi bi-key me-2"></i> 6. ¿Cómo recuperar mi contraseña?
+                </button>
+            </h2>
+            <div id="collapse6" class="accordion-collapse collapse" data-bs-parent="#accordionAyuda">
+                <div class="accordion-body">
+                    <ol>
+                        <li>En la página de inicio de sesión, haz clic en <strong>"¿Olvidaste tu contraseña?"</strong>.</li>
+                        <li>Ingresa tu <strong>correo electrónico</strong>.</li>
+                        <li>Recibirás un enlace de recuperación en tu correo.</li>
+                        <li>Haz clic en el enlace y sigue las instrucciones para establecer una nueva contraseña.</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+
+        <!-- 7. Pagos con ePayco -->
+        <div class="accordion-item">
+            <h2 class="accordion-header">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse7">
+                    <i class="bi bi-credit-card me-2"></i> 7. ¿Cómo pagar un plan?
+                </button>
+            </h2>
+            <div id="collapse7" class="accordion-collapse collapse" data-bs-parent="#accordionAyuda">
+                <div class="accordion-body">
+                    <ol>
+                        <li>En la página principal, selecciona el plan <strong>"EMPRESA"</strong>.</li>
+                        <li>Haz clic en <strong>"Pagar con ePayco (PSE)"</strong>.</li>
+                        <li>Serás redirigido a la pasarela de pagos de ePayco.</li>
+                        <li>Completa los datos y confirma el pago (en modo prueba).</li>
+                        <li>Después del pago, serás redirigido a la página de éxito.</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="mt-4 text-center">
+        <a href="{% url 'core:inicio' %}" class="btn btn-primary">Volver al inicio</a>
+    </div>
+</div>
+{% endblock %}

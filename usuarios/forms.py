@@ -5,6 +5,9 @@ from empresas.models import Empresa, Plan
 
 # Formulario de registro unificado (existente)
 class RegistroUnificadoForm(forms.Form):
+    nombres = forms.CharField(max_length=50, required=False, label="Nombres", widget=forms.TextInput(attrs={'class': 'form-control'}))
+    apellidos = forms.CharField(max_length=50, required=False, label="Apellidos", widget=forms.TextInput(attrs={'class': 'form-control'}))
+    cedula = forms.CharField(max_length=20, required=False, label="Cédula", widget=forms.TextInput(attrs={'class': 'form-control'}))
     username = forms.CharField(max_length=150, label="Nombre de usuario", widget=forms.TextInput(attrs={'class': 'form-control'}))
     email = forms.EmailField(label="Correo electrónico", widget=forms.EmailInput(attrs={'class': 'form-control'}))
     password = forms.CharField(label="Contraseña", widget=forms.PasswordInput(attrs={'class': 'form-control'}))

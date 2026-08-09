@@ -3,14 +3,38 @@ from django.contrib import messages
 from django.db.models import Q
 from django.http import HttpResponse, FileResponse, Http404
 from django.views.decorators.cache import never_cache
-from .models import Pqrs, RespuestaPqrs
+from django.contrib.auth.decorators import login_required
+from django.core.mail import send_mail
+from django.conf import settings
+from .models import Pqrs, RespuestaPqrs, HistorialPQRS
 from empresas.models import Empresa
+from usuarios.models import PerfilUsuario
 import uuid
 import csv
 from .classification_service import classify_text_zero_shot
 
-# ======CREAR PQRS (con clasificación IA en el backend)=====
+# ============================================================
+# FUNCIÓN AUXILIAR PARA ENVIAR CORREOS
+# ============================================================
+def enviar_notificacion(destinatario, asunto, mensaje):
+    """Envía un correo de notificación al destinatario."""
+    if not destinatario:
+        return
+    try:
+        send_mail(
+            subject=asunto,
+            message=mensaje,
+            from_email=settings.DEFAULT_FROM_EMAIL,
+            recipient_list=[destinatario],
+            fail_silently=False,
+        )
+        print(f"[CORREO] Enviado a {destinatario}")
+    except Exception as e:
+        print(f"[ERROR] No se pudo enviar correo a {destinatario}: {e}")
 
+# ============================================================
+# CREAR PQRS (con clasificación IA en el backend)
+# ============================================================
 def crear_pqrs(request):
     if not request.user.is_authenticated:
         return redirect('usuarios:login')
@@ -47,8 +71,9 @@ def crear_pqrs(request):
                 'es_cliente': es_cliente
             })
 
-        # ======CLASIFICACIÓN POR IA (Hugging Face Zero-Shot)=======
-        
+        # ============================================================
+        # CLASIFICACIÓN POR IA (Hugging Face Zero-Shot)
+        # ============================================================
         tipo_ia = classify_text_zero_shot(descripcion)
 
         codigo = f"PQRS-{uuid.uuid4().hex[:8].upper()}"
@@ -67,6 +92,22 @@ def crear_pqrs(request):
             pqrs.archivo = archivo
             pqrs.save()
 
+        # ============================================================
+        # NOTIFICACIÓN POR CORREO A LA EMPRESA
+        # ============================================================
+        # Buscar usuarios con rol empresa en la empresa destino
+        usuarios_empresa = PerfilUsuario.objects.filter(empresa=empresa_obj, rol='empresa')
+        for perfil_emp in usuarios_empresa:
+            if perfil_emp.usuario.email:
+                enviar_notificacion(
+                    destinatario=perfil_emp.usuario.email,
+                    asunto=f"Nueva PQRS radicada - {codigo}",
+                    mensaje=f"Se ha recibido una nueva PQRS con radicado {codigo}.\n\n"
+                            f"Asunto: {asunto}\n"
+                            f"Descripción: {descripcion}\n\n"
+                            f"Puedes gestionarla desde el dashboard."
+                )
+
         messages.success(request, f'Radicado {codigo} creado (clasificado como {tipo_ia})')
 
         return redirect(
@@ -78,8 +119,9 @@ def crear_pqrs(request):
         'es_cliente': es_cliente
     })
 
-# =====DASHBOARD=======
-
+# ============================================================
+# DASHBOARD (con never_cache, filtros, gráfico y exportación)
+# ============================================================
 @never_cache
 def dashboard(request):
     if not request.user.is_authenticated:
@@ -105,7 +147,7 @@ def dashboard(request):
     if estado:
         queryset = queryset.filter(estado=estado)
 
-    # =====Exportar CSV=====
+    # Exportar CSV
     if request.GET.get('exportar') == 'csv':
         response = HttpResponse(content_type='text/csv')
         response['Content-Disposition'] = 'attachment; filename="pqrs_report.csv"'
@@ -136,8 +178,9 @@ def dashboard(request):
         'resueltas': resueltas,
     })
 
-# ===== DETALLE DE PQRS =====
-
+# ============================================================
+# DETALLE DE PQRS (con botón volver y mejor manejo de archivos)
+# ============================================================
 def detalle_pqrs(request, pqrs_id):
     if not request.user.is_authenticated:
         return redirect('usuarios:login')
@@ -162,9 +205,30 @@ def detalle_pqrs(request, pqrs_id):
                 id_usuario_responde=request.user,
                 texto_respuesta=texto,
             )
+            # ============================================================
+            # NOTIFICACIÓN POR CORREO AL CLIENTE
+            # ============================================================
+            if pqrs.id_usuario_creador.email:
+                enviar_notificacion(
+                    destinatario=pqrs.id_usuario_creador.email,
+                    asunto=f"Respuesta a tu PQRS - {pqrs.codigo_radicado}",
+                    mensaje=f"Tu PQRS con radicado {pqrs.codigo_radicado} ha recibido una respuesta.\n\n"
+                            f"La empresa {pqrs.id_empresa.nombre_empresa} ha respondido:\n"
+                            f"{texto}\n\n"
+                            f"Puedes ver el detalle en tus solicitudes."
+                )
         if nuevo_estado in ['Pendiente', 'En Proceso', 'Resuelta']:
+            estado_anterior = pqrs.estado
             pqrs.estado = nuevo_estado
             pqrs.save()
+            # Guardar en historial
+            HistorialPQRS.objects.create(
+                pqrs=pqrs,
+                usuario=request.user,
+                estado_anterior=estado_anterior,
+                estado_nuevo=nuevo_estado,
+                comentario="Cambio de estado realizado por el usuario"
+            )
         messages.success(request, 'Respuesta enviada')
         return redirect('pqrs:detalle', pqrs_id=pqrs.id)
 
@@ -173,8 +237,9 @@ def detalle_pqrs(request, pqrs_id):
         'respuestas': respuestas
     })
 
-# =====MIS SOLICITUDES (CLIENTE)=====
-
+# ============================================================
+# MIS SOLICITUDES (CLIENTE)
+# ============================================================
 @never_cache
 def mis_solicitudes(request):
     if not request.user.is_authenticated:
@@ -196,8 +261,9 @@ def mis_solicitudes(request):
         'resueltas': pqrs_lista.filter(estado='Resuelta').count(),
     })
 
-# ===== DESCARGA FORZADA DE ARCHIVO=====
-
+# ============================================================
+# DESCARGA FORZADA DE ARCHIVO
+# ============================================================
 def descargar_archivo(request, pqrs_id):
     pqrs = get_object_or_404(Pqrs, id=pqrs_id)
     if not pqrs.archivo:
@@ -211,13 +277,9 @@ def descargar_archivo(request, pqrs_id):
         raise Http404
     return FileResponse(pqrs.archivo.open(), as_attachment=True, filename=pqrs.archivo.name)
 
-# =====EDITAR RESPUESTA=====
-
-from django.shortcuts import get_object_or_404, redirect
-from django.contrib import messages
-from django.contrib.auth.decorators import login_required
-from .models import RespuestaPqrs
-
+# ============================================================
+# EDITAR RESPUESTA
+# ============================================================
 @login_required
 def editar_respuesta(request, respuesta_id):
     respuesta = get_object_or_404(RespuestaPqrs, id=respuesta_id)
@@ -230,7 +292,7 @@ def editar_respuesta(request, respuesta_id):
         nuevo_texto = request.POST.get('texto_respuesta', '').strip()
         if nuevo_texto:
             respuesta.texto_respuesta = nuevo_texto
-            respuesta.save()  
+            respuesta.save()
             messages.success(request, 'Respuesta actualizada correctamente.')
         else:
             messages.error(request, 'El texto de la respuesta no puede estar vacío.')
@@ -238,8 +300,9 @@ def editar_respuesta(request, respuesta_id):
     
     return render(request, 'pqrs/editar_respuesta.html', {'respuesta': respuesta})
 
-# =====ELIMINAR RESPUESTA=====
-
+# ============================================================
+# ELIMINAR RESPUESTA
+# ============================================================
 @login_required
 def eliminar_respuesta(request, respuesta_id):
     respuesta = get_object_or_404(RespuestaPqrs, id=respuesta_id)
@@ -254,3 +317,4 @@ def eliminar_respuesta(request, respuesta_id):
         return redirect('pqrs:detalle', pqrs_id=pqrs_id)
     
     return redirect('pqrs:detalle', pqrs_id=pqrs_id)
+

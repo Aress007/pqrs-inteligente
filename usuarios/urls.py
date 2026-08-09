@@ -12,4 +12,6 @@ urlpatterns = [
     path("pago/confirmacion/", views.confirmacion_pago_epayco, name="pago_confirmacion"),
     path("editar-perfil/", views.editar_perfil, name="editar_perfil"),
     path("cambiar-password/", views.cambiar_password, name="cambiar_password"),
+    path('recuperar-contrasena/', views.recuperar_contraseña, name='recuperar_contraseña'),
+    path('cambiar-contrasena/<str:token>/', views.cambiar_con_token, name='cambiar_con_token'),
 ]

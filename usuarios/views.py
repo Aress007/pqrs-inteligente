@@ -13,6 +13,12 @@ from django.views.decorators.cache import never_cache
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import update_session_auth_hash
 from django.http import HttpResponse
+from django.core.signing import TimestampSigner, BadSignature, SignatureExpired
+from django.template.loader import render_to_string
+from django.core.mail import EmailMultiAlternatives
+from django.contrib.auth.hashers import make_password
+from django.urls import reverse
+from django.utils.html import strip_tags
 from empresas.models import Empresa, Plan
 from .models import PerfilUsuario
 from .forms import (
@@ -108,7 +114,7 @@ def registro_unificado(request):
                     id_plan=plan,
                 )
                 PerfilUsuario.objects.create(
-                    usuario=user, empresa=empresa, telefono=telefono, rol="empresa"
+                    nombres=form.cleaned_data.get('nombres'), apellidos=form.cleaned_data.get('apellidos'), cedula=form.cleaned_data.get('cedula'), usuario=user, empresa=empresa, telefono=telefono, rol="empresa"
                 )
                 messages.success(request, "Empresa registrada exitosamente")
                 user_auth = authenticate(request, username=username, password=password)
@@ -124,7 +130,7 @@ def registro_unificado(request):
                     return redirect("usuarios:login")
             else:
                 PerfilUsuario.objects.create(
-                    usuario=user, telefono=telefono, rol="cliente", empresa=None
+                    nombres=form.cleaned_data.get('nombres'), apellidos=form.cleaned_data.get('apellidos'), cedula=form.cleaned_data.get('cedula'), usuario=user, telefono=telefono, rol="cliente", empresa=None
                 )
                 messages.success(request, "Cliente registrado exitosamente")
                 user_auth = authenticate(request, username=username, password=password)
@@ -336,3 +342,116 @@ def confirmacion_pago_epayco(request):
         return HttpResponse("Pago rechazado", status=200)  
 
     return HttpResponse("Error procesando webhook", status=400)
+
+# =======RECUPERACIÓN DE CONTRASEÑA CON CORREO REAL=========
+@never_cache
+def recuperar_contraseña(request):
+    if request.method == 'POST':
+        email = request.POST.get('email')
+
+        try:
+            user = User.objects.get(email=email)
+        except User.DoesNotExist:
+            messages.error(request, "El correo ingresado no está registrado.")
+            return render(request, 'usuarios/recuperar_contraseña.html')
+
+        signer = TimestampSigner()
+        token = signer.sign(str(user.pk))
+
+        reset_url = request.build_absolute_uri(
+            reverse('usuarios:cambiar_con_token', args=[token])
+        )
+
+        html_message = render_to_string(
+            'usuarios/msg_correo.html',
+            {
+                'username': user.username,
+                'reset_url': reset_url,
+                'site_name': 'PQRS Inteligente',
+            }
+        )
+
+        subject = "Recuperación de contraseña - PQRS Inteligente"
+        text_message = strip_tags(html_message)
+
+        try:
+            email_msg = EmailMultiAlternatives(
+                subject=subject,
+                body=text_message,
+                from_email=settings.DEFAULT_FROM_EMAIL,
+                to=[email]
+            )
+
+            email_msg.attach_alternative(html_message, "text/html")
+            email_msg.send()
+
+            messages.success(
+                request,
+                "Se ha enviado un enlace de recuperación a tu correo."
+            )
+
+            return redirect('usuarios:login')
+
+        except Exception as e:
+            messages.error(
+                request,
+                f"Error al enviar el correo: {str(e)}"
+            )
+
+            return render(
+                request,
+                'usuarios/recuperar_contraseña.html'
+            )
+
+    return render(request, 'usuarios/recuperar_contraseña.html')
+
+
+def cambiar_con_token(request, token):
+
+    signer = TimestampSigner()
+
+    try:
+        user_id = signer.unsign(token, max_age=3600)
+
+        usuario = get_object_or_404(User, pk=user_id)
+
+    except (BadSignature, SignatureExpired):
+
+        messages.error(
+            request,
+            "El enlace de recuperación es inválido o ha expirado."
+        )
+
+        return redirect('usuarios:recuperar_contraseña')
+
+    if request.method == 'POST':
+
+        new_password = request.POST.get('new_password')
+        confirm_password = request.POST.get('confirm_password')
+
+        if new_password != confirm_password:
+
+            messages.error(
+                request,
+                "Las contraseñas no coinciden."
+            )
+
+            return render(
+                request,
+                'usuarios/cambiar_con_token.html'
+            )
+
+        usuario.password = make_password(new_password)
+        usuario.save()
+
+        messages.success(
+            request,
+            "Contraseña cambiada correctamente. Inicia sesión."
+        )
+
+        return redirect('usuarios:login')
+
+    return render(
+        request,
+        'usuarios/cambiar_con_token.html'
+    )

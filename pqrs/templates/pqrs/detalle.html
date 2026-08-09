@@ -21,6 +21,7 @@
         </div>
         <div class="card-body">
             <p><strong>Descripción:</strong> {{ pqrs.descripcion }}</p>
+            <p><strong>Empresa destino:</strong> {{ pqrs.id_empresa.nombre_empresa }}</p>
             <p><strong>Tipo IA:</strong> {{ pqrs.tipo_detectado|capfirst }}</p>
             <p><strong>Estado:</strong> 
                 <span class="badge {% if pqrs.estado == 'Pendiente' %}bg-warning{% elif pqrs.estado == 'En Proceso' %}bg-info{% else %}bg-success{% endif %}">
@@ -110,3 +111,25 @@
     {% endif %}
 </div>
 {% endblock %}
+
+<!-- Historial de cambios -->
+<div class="card mb-4">
+    <div class="card-header">Historial de cambios de estado</div>
+    <div class="card-body">
+        {% if pqrs.historial.all %}
+            <ul class="list-unstyled">
+                {% for h in pqrs.historial.all|dictsort:"fecha" %}
+                <li>
+                    <strong>{{ h.fecha|date:"d/m/Y H:i" }}</strong> - 
+                    {{ h.usuario.username }} cambió de 
+                    <span class="badge bg-secondary">{{ h.estado_anterior|default:"Nuevo" }}</span> 
+                    a <span class="badge bg-primary">{{ h.estado_nuevo }}</span>
+                    {% if h.comentario %}<br><small>{{ h.comentario }}</small>{% endif %}
+                </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p>No hay cambios de estado registrados.</p>
+        {% endif %}
+    </div>
+</div>

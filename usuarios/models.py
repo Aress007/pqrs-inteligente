@@ -7,6 +7,9 @@ class PerfilUsuario(models.Model):
         ('empresa', 'Administrador de Empresa'),
         ('cliente', 'Cliente'),
     )
+    nombres = models.CharField(max_length=50, blank=True, null=True)
+    apellidos = models.CharField(max_length=50, blank=True, null=True)
+    cedula = models.CharField(max_length=20, blank=True, null=True)
     usuario = models.OneToOneField(User, on_delete=models.CASCADE, related_name='perfil')
     empresa = models.ForeignKey(Empresa, on_delete=models.SET_NULL, null=True, blank=True, verbose_name="Empresa (solo para roles empresa)")
     telefono = models.CharField(max_length=15, blank=True, null=True)

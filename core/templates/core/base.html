@@ -141,34 +141,34 @@
           </ul>
           <div class="d-flex gap-2 align-items-center">
             {% if user.is_authenticated %}
-            <span class="text-white me-2">
+            <span class="text-white me-2" title="Usuario autenticado">
               <i class="bi bi-person-circle"></i> {{ user.username }}
             </span>
-            <a
-              href="{% url 'usuarios:editar_perfil' %}"
-              class="btn btn-outline-light btn-sm me-1"
-            >
+            <a href="{% url 'core:ayuda' %}" class="btn btn-outline-light btn-sm me-1" title="Manual de usuario">
+              <i class="bi bi-question-circle"></i> Ayuda
+            </a>
+            {% if user.perfil.rol == 'empresa' %}
+              <a href="{% url 'core:respaldar_bd' %}" class="btn btn-outline-light btn-sm me-1" title="Descargar respaldo de la base de datos">
+                <i class="bi bi-download"></i> Respaldo BD
+              </a>
+              <a href="{% url 'core:restaurar_bd' %}" class="btn btn-outline-light btn-sm me-1" title="Restaurar base de datos desde archivo">
+                <i class="bi bi-upload"></i> Restaurar BD
+              </a>
+            {% endif %}
+            <a href="{% url 'usuarios:editar_perfil' %}" class="btn btn-outline-light btn-sm me-1" title="Editar perfil de usuario">
               <i class="bi bi-pencil-square"></i> Mi perfil
             </a>
-            <form
-              method="POST"
-              action="{% url 'usuarios:logout' %}"
-              style="display: inline"
-            >
+            <form method="POST" action="{% url 'usuarios:logout' %}" style="display: inline">
               {% csrf_token %}
-              <button type="submit" class="btn btn-outline-light btn-sm">
+              <button type="submit" class="btn btn-outline-light btn-sm" title="Cerrar sesión">
                 <i class="bi bi-box-arrow-right"></i> Cerrar sesión
               </button>
             </form>
-            
             {% else %}
-            <a href="{% url 'usuarios:login' %}" class="nav-link text-white">
+            <a href="{% url 'usuarios:login' %}" class="nav-link text-white" title="Iniciar sesión en el sistema">
               <i class="bi bi-person me-1"></i>Iniciar Sesión
             </a>
-            <a
-              href="{% url 'usuarios:registro_unificado' %}"
-              class="btn btn-registro"
-            >
+            <a href="{% url 'usuarios:registro_unificado' %}" class="btn btn-registro" title="Crear nueva cuenta">
               <i class="bi bi-person-plus me-1"></i>Regístrate
             </a>
             {% endif %}
@@ -218,22 +218,63 @@
 
     <!-- ===== FOOTER ===== -->
     <footer>
-      <div class="container text-center">
-        <p class="mb-1">
-          <i class="bi bi-shield-lock me-1"></i>
-          &copy; 2026 PQRS-INTELIGENTE — Proyecto SENA Cúcuta
-        </p>
-        <small>
+      <div class="container">
+        <div class="row text-start text-md-center">
+          <!-- Columna 1: Información institucional -->
+          <div class="col-md-4 mb-3">
+            <h6 class="fw-bold text-white">PQRS Inteligente</h6>
+            <p class="mb-1 small">
+              <i class="bi bi-geo-alt me-1"></i> SENA Cúcuta, Norte de Santander
+            </p>
+            <p class="mb-1 small">
+              <i class="bi bi-telephone me-1"></i> +57 310 867 4020
+            </p>
+            <p class="mb-1 small">
+              <i class="bi bi-envelope me-1"></i> soporte@pqrs-inteligente.com
+            </p>
+          </div>
+
+          <!-- Columna 2: Enlaces útiles -->
+          <div class="col-md-4 mb-3">
+            <h6 class="fw-bold text-white">Enlaces rápidos</h6>
+            <ul class="list-unstyled small">
+              <li><a href="#" class="text-white-50 text-decoration-none">Términos y condiciones</a></li>
+              <li><a href="#" class="text-white-50 text-decoration-none">Política de privacidad</a></li>
+              <li><a href="#" class="text-white-50 text-decoration-none">Ayuda / FAQ</a></li>
+              <li><a href="#" class="text-white-50 text-decoration-none">Contacto</a></li>
+            </ul>
+          </div>
+
+          <!-- Columna 3: Redes sociales y créditos -->
+          <div class="col-md-4 mb-3">
+            <h6 class="fw-bold text-white">Síguenos</h6>
+            <div class="d-flex justify-content-center gap-3">
+              <a href="#" class="text-white-50" aria-label="Facebook"><i class="bi bi-facebook fs-5"></i></a>
+              <a href="#" class="text-white-50" aria-label="Twitter"><i class="bi bi-twitter fs-5"></i></a>
+              <a href="#" class="text-white-50" aria-label="Instagram"><i class="bi bi-instagram fs-5"></i></a>
+              <a href="#" class="text-white-50" aria-label="YouTube"><i class="bi bi-youtube fs-5"></i></a>
+            </div>
+            <p class="mt-2 small">
+              <i class="bi bi-shield-lock me-1"></i>
+              &copy; 2026 PQRS-INTELIGENTE — Proyecto SENA Cúcuta
+            </p>
+          </div>
+        </div>
+
+        <!-- Línea inferior -->
+        <hr class="border-light opacity-25" />
+        <div class="text-center small">
           Cumplimos con la
           <a
             href="https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=49981"
             target="_blank"
             rel="noopener noreferrer"
+            class="text-white-50"
           >
             Ley 1581 de 2012
           </a>
           — Protección de Datos Personales
-        </small>
+        </div>
       </div>
     </footer>
 

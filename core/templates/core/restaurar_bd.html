@@ -1,0 +1,32 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Restaurar Base de Datos{% endblock %}
+
+{% block breadcrumb %}
+    <li class="breadcrumb-item active">Restaurar Base de Datos</li>
+{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card shadow">
+            <div class="card-header bg-primary text-white">
+                <h3 class="h5 mb-0">Restaurar Base de Datos</h3>
+            </div>
+            <div class="card-body">
+                <p>Selecciona un archivo JSON de respaldo para restaurar la base de datos.</p>
+                <p class="text-warning"><i class="bi bi-exclamation-triangle"></i> Esta acción sobrescribirá los datos actuales.</p>
+                <form method="POST" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label class="form-label">Archivo JSON</label>
+                        <input type="file" name="archivo" class="form-control" accept=".json" required>
+                    </div>
+                    <button type="submit" class="btn btn-danger">Restaurar</button>
+                    <a href="{% url 'core:inicio' %}" class="btn btn-secondary">Cancelar</a>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
