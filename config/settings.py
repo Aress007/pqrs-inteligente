@@ -2,21 +2,45 @@
 Configuración del proyecto PQRS-INTELIGENTE
 Django - Proyecto Final SENA Cúcuta 2026
 """
+
 import os
 from pathlib import Path
+from dotenv import load_dotenv
 
-# Ruta base del proyecto
+# ============================================================
+# CARGAR VARIABLES DE ENTORNO
+# ============================================================
+
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# Cambiar esta clave antes de desplegar en producción
-SECRET_KEY = 'django-insecure-2$gb5q@s0u&z4bw^1)!8q5-3%irr_-3=8-kr=b_oivan!#3%c3'
+load_dotenv(BASE_DIR / '.env')
 
-# En producción cambiar a False
-DEBUG = os.environ.get('DEBUG', 'True') == 'True'
 
-ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', 'localhost,127.0.0.1').split(',')
+# ============================================================
+# CONFIGURACIÓN GENERAL
+# ============================================================
 
-# ===== APLICACIONES INSTALADAS =====
+SECRET_KEY = os.getenv(
+    'SECRET_KEY',
+    'django-insecure-clave-solo-para-desarrollo'
+)
+
+DEBUG = os.getenv('DEBUG', 'True').lower() == 'true'
+
+ALLOWED_HOSTS = [
+    host.strip()
+    for host in os.getenv(
+        'ALLOWED_HOSTS',
+        'localhost,127.0.0.1'
+    ).split(',')
+    if host.strip()
+]
+
+
+# ============================================================
+# APLICACIONES INSTALADAS
+# ============================================================
+
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -32,6 +56,11 @@ INSTALLED_APPS = [
     'usuarios',
 ]
 
+
+# ============================================================
+# MIDDLEWARE
+# ============================================================
+
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -42,7 +71,13 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
+
 ROOT_URLCONF = 'config.urls'
+
+
+# ============================================================
+# TEMPLATES
+# ============================================================
 
 TEMPLATES = [
     {
@@ -60,9 +95,14 @@ TEMPLATES = [
     },
 ]
 
+
 WSGI_APPLICATION = 'config.wsgi.application'
 
-# ===== BASE DE DATOS =====
+
+# ============================================================
+# BASE DE DATOS
+# ============================================================
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
@@ -70,62 +110,154 @@ DATABASES = {
     }
 }
 
-# ===== VALIDACIÓN DE CONTRASEÑAS =====
+
+# ============================================================
+# VALIDACIÓN DE CONTRASEÑAS
+# ============================================================
+
 AUTH_PASSWORD_VALIDATORS = [
-    {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'},
-    {'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator'},
-    {'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator'},
-    {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator'},
+    {
+        'NAME':
+        'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'
+    },
+    {
+        'NAME':
+        'django.contrib.auth.password_validation.MinimumLengthValidator'
+    },
+    {
+        'NAME':
+        'django.contrib.auth.password_validation.CommonPasswordValidator'
+    },
+    {
+        'NAME':
+        'django.contrib.auth.password_validation.NumericPasswordValidator'
+    },
 ]
 
-# ===== INTERNACIONALIZACIÓN =====
+
+# ============================================================
+# INTERNACIONALIZACIÓN
+# ============================================================
+
 LANGUAGE_CODE = 'es-co'
+
 TIME_ZONE = 'America/Bogota'
+
 USE_I18N = True
+
 USE_TZ = True
 
-# ===== ARCHIVOS ESTÁTICOS =====
+
+# ============================================================
+# ARCHIVOS ESTÁTICOS
+# ============================================================
+
 STATIC_URL = '/static/'
-STATICFILES_DIRS = [BASE_DIR / 'static']
+
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 
-# ===== ARCHIVOS MEDIA (fotos de perfil, adjuntos PQRS) =====
+
+# ============================================================
+# ARCHIVOS MEDIA
+# ============================================================
+
 MEDIA_URL = '/media/'
+
 MEDIA_ROOT = BASE_DIR / 'media'
 
-# ===== AUTENTICACIÓN Y REDIRECCIONES =====
+DATA_UPLOAD_MAX_MEMORY_SIZE = 5242880
+
+
+# ============================================================
+# AUTENTICACIÓN Y REDIRECCIONES
+# ============================================================
+
 LOGIN_URL = '/usuarios/login/'
+
 LOGIN_REDIRECT_URL = '/pqrs/dashboard/'
+
 LOGOUT_REDIRECT_URL = '/usuarios/login/'
 
-# ===== CAMPO PRIMARIO POR DEFECTO =====
+
+# ============================================================
+# CAMPO PRIMARIO POR DEFECTO
+# ============================================================
+
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-# ===== MENSAJES (para alertas éxito/error/info) =====
+
+# ============================================================
+# MENSAJES
+# ============================================================
+
 from django.contrib.messages import constants as messages
+
 MESSAGE_TAGS = {
-    messages.DEBUG:   'debug',
-    messages.INFO:    'info',
+    messages.DEBUG: 'debug',
+    messages.INFO: 'info',
     messages.SUCCESS: 'success',
     messages.WARNING: 'warning',
-    messages.ERROR:   'error',
+    messages.ERROR: 'error',
 }
 
-# ===== CONFIGURACIÓN DE EPAYCO (Sandbox) =====
-EPAYCO_PUBLIC_KEY = '2f21c65e4a491f917cf8be32228fea81'
-EPAYCO_PRIVATE_KEY = '41a6598805ddd4463248b01a2afcf3bc'  
-EPAYCO_P_CUST_ID_CLIENTE = '1586550'  # ID de cliente de prueba
-EPAYCO_P_KEY = '56860f2288b54e51ea062b9785bad8db410380d5'  # P_KEY de prueba
-EPAYCO_TEST = True  
-EPAYCO_LANG = 'ES'
 
-# ===== CONFIGURACIÓN DE CORREO PARA DESARROLLO =====
-#  EMAIL_BACKEND = 'django.core.mail.backends.filebased.EmailBackend'
-#  EMAIL_FILE_PATH = BASE_DIR / 'sent_emails'
+# ============================================================
+# EPAYCO
+# ============================================================
+
+EPAYCO_PUBLIC_KEY = os.getenv('EPAYCO_PUBLIC_KEY')
+
+EPAYCO_PRIVATE_KEY = os.getenv('EPAYCO_PRIVATE_KEY')
+
+EPAYCO_P_CUST_ID_CLIENTE = os.getenv(
+    'EPAYCO_P_CUST_ID_CLIENTE'
+)
+
+EPAYCO_P_KEY = os.getenv('EPAYCO_P_KEY')
+
+EPAYCO_TEST = os.getenv(
+    'EPAYCO_TEST',
+    'True'
+).lower() == 'true'
+
+EPAYCO_LANG = os.getenv(
+    'EPAYCO_LANG',
+    'ES'
+)
+
+
+# ============================================================
+# CORREO
+# ============================================================
+
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'smtp.gmail.com'
-EMAIL_PORT = 587
-EMAIL_USE_TLS = True
-EMAIL_HOST_USER = 'aresjq21@gmail.com' 
-EMAIL_HOST_PASSWORD = 'lrpi zihw lopq unpm'       
-DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
+
+EMAIL_HOST = os.getenv(
+    'EMAIL_HOST',
+    'smtp.gmail.com'
+)
+
+EMAIL_PORT = int(
+    os.getenv(
+        'EMAIL_PORT',
+        '587'
+    )
+)
+
+EMAIL_USE_TLS = os.getenv(
+    'EMAIL_USE_TLS',
+    'True'
+).lower() == 'true'
+
+EMAIL_HOST_USER = os.getenv(
+    'EMAIL_HOST_USER'
+)
+
+EMAIL_HOST_PASSWORD = os.getenv(
+    'EMAIL_HOST_PASSWORD'
+)
+
+DEFAULT_FROM_EMAIL = os.getenv(
+    'DEFAULT_FROM_EMAIL',
+    EMAIL_HOST_USER
+)

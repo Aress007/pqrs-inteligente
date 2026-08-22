@@ -18,7 +18,7 @@
                     Ingresa tu correo electrónico y te enviaremos un enlace para restablecer tu contraseña.
                 </p>
                 <form method="POST">
-                    {% csrf_token %}
+                    {% csrf_token %} <!-- Token de seguridad CSRF para proteger el formulario contra solicitudes falsificadas -->
                     <div class="mb-4">
                         <label class="form-label fw-semibold">Correo electrónico</label>
                         <input type="email" name="email" class="form-control form-control-lg" placeholder="Ingresa tu correo" required>

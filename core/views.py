@@ -57,11 +57,8 @@ def restaurar_bd(request):
     if request.method == 'POST' and request.FILES.get('archivo'):
         try:
             archivo = request.FILES['archivo']
-            # Leer el archivo subido
             data = archivo.read().decode('utf-8')
-            # Crear un buffer y cargar los datos
             buffer = io.StringIO(data)
-            # Usar loaddata desde el buffer
             call_command('loaddata', buffer, format='json')
             messages.success(request, "Base de datos restaurada correctamente.")
         except Exception as e:
@@ -69,3 +66,11 @@ def restaurar_bd(request):
         return redirect('core:inicio')
     
     return render(request, 'core/restaurar_bd.html')
+
+@login_required
+def funciones(request):
+    # Solo empresas pueden acceder
+    if request.user.perfil.rol != 'empresa':
+        messages.warning(request, 'Acceso solo para empresas.')
+        return redirect('core:inicio')
+    return render(request, 'core/funciones.html')

@@ -1,8 +1,3 @@
-from django.conf import settings
-import time
-import hashlib
-from datetime import timedelta
-from django.utils import timezone
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
@@ -12,25 +7,34 @@ from django.views.decorators.csrf import ensure_csrf_cookie, csrf_exempt
 from django.views.decorators.cache import never_cache
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import update_session_auth_hash
-from django.http import HttpResponse
+from django.contrib.auth.hashers import make_password
 from django.core.signing import TimestampSigner, BadSignature, SignatureExpired
 from django.template.loader import render_to_string
 from django.core.mail import EmailMultiAlternatives
-from django.contrib.auth.hashers import make_password
 from django.urls import reverse
 from django.utils.html import strip_tags
+from django.conf import settings
+from django.http import HttpResponse
+import os
+import time
 from empresas.models import Empresa, Plan
 from .models import PerfilUsuario
-from .forms import (
-    RegistroUnificadoForm,
-    EditarPerfilForm,
-    EditarTelefonoForm,
-    CambiarPasswordForm,
-)
+from .forms import (RegistroUnificadoForm, EditarPerfilForm, CambiarPasswordForm,)
 
 
-# ===== LOGIN =====
+# ============================================================
+# FUNCIÓN AUXILIAR PARA ELIMINAR ARCHIVOS
+# ============================================================
+def eliminar_archivo_si_existe(ruta):
+    """Elimina un archivo físico si existe."""
+    if ruta and os.path.isfile(ruta):
+        os.remove(ruta)
+        return True
+    return False
 
+# ============================================================
+# LOGIN
+# ============================================================
 @never_cache
 def login_view(request):
     if request.user.is_authenticated:
@@ -67,13 +71,19 @@ def login_view(request):
             messages.error(request, "Credenciales incorrectas")
     return render(request, "usuarios/login.html")
 
-
-# ===== LOGOUT =====
-
+# ============================================================
+# LOGOUT
+# ============================================================
 @require_http_methods(["POST"])
 @ensure_csrf_cookie
 @never_cache
 def logout_view(request):
+    try:
+        from pqrs.models import ChatMensaje
+        ChatMensaje.objects.filter(usuario=request.user).delete()
+    except:
+        pass 
+    
     logout(request)
     messages.info(request, "Sesión cerrada correctamente")
     response = redirect("core:inicio")
@@ -82,9 +92,9 @@ def logout_view(request):
     response["Expires"] = "0"
     return response
 
-
-# ===== REGISTRO UNIFICADO =====
-
+# ============================================================
+# REGISTRO UNIFICADO
+# ============================================================
 def registro_unificado(request):
     if request.method == "POST":
         form = RegistroUnificadoForm(request.POST)
@@ -114,7 +124,10 @@ def registro_unificado(request):
                     id_plan=plan,
                 )
                 PerfilUsuario.objects.create(
-                    nombres=form.cleaned_data.get('nombres'), apellidos=form.cleaned_data.get('apellidos'), cedula=form.cleaned_data.get('cedula'), usuario=user, empresa=empresa, telefono=telefono, rol="empresa"
+                    usuario=user,
+                    empresa=empresa,
+                    telefono=telefono,
+                    rol="empresa",
                 )
                 messages.success(request, "Empresa registrada exitosamente")
                 user_auth = authenticate(request, username=username, password=password)
@@ -130,7 +143,10 @@ def registro_unificado(request):
                     return redirect("usuarios:login")
             else:
                 PerfilUsuario.objects.create(
-                    nombres=form.cleaned_data.get('nombres'), apellidos=form.cleaned_data.get('apellidos'), cedula=form.cleaned_data.get('cedula'), usuario=user, telefono=telefono, rol="cliente", empresa=None
+                    usuario=user,
+                    telefono=telefono,
+                    rol="cliente",
+                    empresa=None,
                 )
                 messages.success(request, "Cliente registrado exitosamente")
                 user_auth = authenticate(request, username=username, password=password)
@@ -152,41 +168,103 @@ def registro_unificado(request):
         request, "usuarios/registro_unificado.html", {"form": form, "planes": planes}
     )
 
-# ===== EDITAR PERFIL =====
+# ============================================================
+# VISTA DE PAGO SIMULADO
+# ============================================================
+@never_cache
+def pago_simulado(request):
+    return render(request, "usuarios/pago_simulado.html")
 
+# ============================================================
+# EDITAR PERFIL
+# ============================================================
 @login_required
 def editar_perfil(request):
     perfil = request.user.perfil
+
     if request.method == "POST":
-        user_form = EditarPerfilForm(request.POST, instance=request.user)
-        telefono_form = EditarTelefonoForm(request.POST)
-        if user_form.is_valid() and telefono_form.is_valid():
-            user_form.save()
-            perfil.telefono = telefono_form.cleaned_data["telefono"]
-            perfil.save()
-            messages.success(request, "Tu perfil ha sido actualizado correctamente.")
+
+        # ============================================================
+        # ELIMINAR FOTO DE PERFIL
+        # ============================================================
+        if request.POST.get("eliminar_foto") == "on":
+            if perfil.foto:
+                try:
+                    eliminar_archivo_si_existe(perfil.foto.path)
+                except Exception:
+                    pass
+                
+                perfil.foto = None
+                perfil.save(update_fields=["foto"])
+
+                messages.success(
+                    request,
+                    "Foto de perfil eliminada correctamente."
+                )
+                return redirect("usuarios:editar_perfil")
+
+        # ============================================================
+        # ELIMINAR LOGO DE EMPRESA
+        # ============================================================
+        if request.POST.get("eliminar_logo") == "on":
+            if perfil.logo:
+                try:
+                    eliminar_archivo_si_existe(perfil.logo.path)
+                except Exception:
+                    pass
+
+                perfil.logo = None
+                perfil.save(update_fields=["logo"])
+
+                messages.success(
+                    request,
+                    "Logo de la empresa eliminado correctamente."
+                )
+                return redirect("usuarios:editar_perfil")
+
+        # ============================================================
+        # GUARDAR CAMBIOS DEL PERFIL
+        # ============================================================
+        form = EditarPerfilForm(
+            request.POST,
+            request.FILES,
+            instance=request.user
+        )
+
+        if form.is_valid():
+            form.save()
+
+            messages.success(
+                request,
+                "Tu perfil ha sido actualizado correctamente."
+            )
+
             if perfil.rol == "empresa":
                 return redirect("pqrs:dashboard")
             else:
                 return redirect("pqrs:mis_solicitudes")
+
         else:
-            messages.error(request, "Por favor corrige los errores.")
+            print("ERRORES DEL FORMULARIO:", form.errors)
+            messages.error(
+                request,
+                "Por favor corrige los errores."
+            )
+
     else:
-        user_form = EditarPerfilForm(instance=request.user)
-        telefono_form = EditarTelefonoForm(initial={"telefono": perfil.telefono})
+        form = EditarPerfilForm(instance=request.user)
 
     return render(
         request,
         "usuarios/editar_perfil.html",
         {
-            "user_form": user_form,
-            "telefono_form": telefono_form,
+            "user_form": form,
         },
     )
 
-
-# ===== CAMBIAR CONTRASEÑA =====
-
+# ============================================================
+# CAMBIAR CONTRASEÑA
+# ============================================================
 @login_required
 def cambiar_password(request):
     perfil = request.user.perfil
@@ -206,174 +284,57 @@ def cambiar_password(request):
         form = CambiarPasswordForm(request.user)
     return render(request, "usuarios/cambiar_password.html", {"form": form})
 
-
-# ===== PAGO CON EPAYCO (WEB CHECKOUT - MODO SANDBOX) =====
-
+# ============================================================
+# PAGO CON EPAYCO (Web Checkout)
+# ============================================================
 def iniciar_pago_epayco(request, plan_id):
-    """Inicia el pago con ePayco usando Web Checkout"""
     plan = get_object_or_404(Plan, id=plan_id)
-
     if not request.user.is_authenticated:
         messages.error(request, "Debes iniciar sesión para pagar")
         return redirect('usuarios:login')
-    try:
-        perfil = request.user.perfil
-        if perfil.rol != 'empresa' or not perfil.empresa:
-            messages.error(request, "No tienes una empresa asociada")
-            return redirect('core:inicio')
-        empresa = perfil.empresa
-    except:
-        messages.error(request, "Perfil de usuario no válido")
-        return redirect('core:inicio')
-
-    referencia = f"plan_{plan.id}_{empresa.id}_{int(time.time())}"
-    empresa.ref_payco = referencia
-    empresa.save()
-
-    url_response = request.build_absolute_uri('/pago/exitoso/')
-    url_confirmation = request.build_absolute_uri('/pago/confirmacion/')
 
     context = {
         'plan': plan,
         'public_key': settings.EPAYCO_PUBLIC_KEY,
-        'reference': referencia,
+        'reference': f"plan_{plan.id}_{request.user.id}_{int(time.time())}",
         'email': request.user.email,
-        'url_response': url_response,
-        'url_confirmation': url_confirmation,
+        'url_response': request.build_absolute_uri('/pago/exitoso/'),
+        'url_confirmation': request.build_absolute_uri('/pago/confirmacion/'),
     }
-
     return render(request, 'usuarios/checkout_epayco.html', context)
-
-
-# ===== VISTA DE RESPUESTA (REDIRECCIÓN POST-PAGO) =====
-
-@never_cache
-def pago_exitoso(request):
-    """Redirección después de pagar (recibe parámetros GET de ePayco)"""
-    resultado = request.GET.get('x_resultado', '')
-    ref_payco = request.GET.get('x_ref_payco', '')
-    mensaje = request.GET.get('x_mensaje', '')
-    cod_transaccion = request.GET.get('x_cod_transaccion', '')
-
-    context = {
-        'resultado': resultado,
-        'ref_payco': ref_payco,
-        'mensaje': mensaje,
-        'cod_transaccion': cod_transaccion,
-    }
-
-    if resultado == 'Aceptado':
-        # Buscar la empresa por la referencia (ref_payco)
-        try:
-            empresa = Empresa.objects.get(ref_payco=ref_payco)
-            messages.success(request, "¡Pago exitoso! Tu plan ha sido activado.")
-            return redirect('pqrs:dashboard')
-        except Empresa.DoesNotExist:
-            messages.warning(request, "No se encontró la empresa asociada al pago, pero el pago fue aceptado. Contacta a soporte.")
-            return redirect('core:inicio')
-    else:
-        messages.error(request, f"El pago no fue aceptado: {mensaje}")
-        return render(request, 'usuarios/pago_resultado.html', context)
-
-
-# ===== WEBHOOK DE CONFIRMACIÓN (NOTIFICACIÓN DE EPAYCO) =====
 
 @csrf_exempt
 def confirmacion_pago_epayco(request):
-    """Webhook que ePayco llama para confirmar el pago (POST)"""
-    if request.method != 'POST':
-        return HttpResponse("Método no permitido", status=405)
+    if request.method == 'POST':
+        data = request.POST.dict()
+        print(f"[EPAyCO WEBHOOK] Datos recibidos: {data}")
+        return HttpResponse("OK")
+    return HttpResponse("Método no permitido", status=405)
 
-    data = request.POST.dict()
-    print(f"[EPAyCO WEBHOOK] Datos recibidos: {data}")
-    p_cust_id_cliente = getattr(settings, 'EPAYCO_P_CUST_ID_CLIENTE', '')
-    x_ref_payco = data.get('x_ref_payco', '')
-    x_transaction_id = data.get('x_transaction_id', '')
-    x_amount = data.get('x_amount', '')
-    x_currency_code = data.get('x_currency_code', '')
-    x_test_request = data.get('x_test_request', '')
-    x_signature = data.get('x_signature', '')
-
-    if not p_cust_id_cliente or not x_signature:
-        return HttpResponse("Faltan datos para validar firma", status=400)
-
-    # Construir cadena para firma
-    cadena = f"{p_cust_id_cliente}^{x_ref_payco}^{x_transaction_id}^{x_amount}^{x_currency_code}^{x_test_request}"
-    firma_calculada = hashlib.sha256(cadena.encode('utf-8')).hexdigest()
-
-    if firma_calculada != x_signature:
-        print(f"[ERROR] Firma inválida. Esperada: {firma_calculada}, Recibida: {x_signature}")
-        return HttpResponse("Firma inválida", status=400)
-
-    # 2. Procesar el pago si es exitoso
-    x_resultado = data.get('x_resultado', '')
-    if x_resultado == 'Aceptado':
-        try:
-            empresa = Empresa.objects.get(ref_payco=x_ref_payco)
-
-            try:
-                partes = x_ref_payco.split('_')
-                if len(partes) >= 3:
-                    plan_id = int(partes[1])
-                    plan = Plan.objects.get(id=plan_id)
-                    empresa.id_plan = plan
-                else:
-                    pass
-            except:
-           
-                pass
-
-            # Actualizar fechas de suscripción (ejemplo: 30 días desde ahora)
-            ahora = timezone.now()
-            empresa.fecha_inicio_suscripcion = ahora
-            empresa.fecha_fin_suscripcion = ahora + timedelta(days=30)
-            empresa.pago_activo = True
-            empresa.ref_payco = x_ref_payco  
-            empresa.save()
-
-            print(f"[EPAyCO] Pago exitoso para empresa {empresa.id} - Plan actualizado")
-            return HttpResponse("OK", status=200)
-
-        except Empresa.DoesNotExist:
-            print(f"[ERROR] Empresa no encontrada para ref_payco: {x_ref_payco}")
-            return HttpResponse("Empresa no encontrada", status=404)
-    else:
-        print(f"[EPAyCO] Pago rechazado: {x_resultado}")
-        return HttpResponse("Pago rechazado", status=200)  
-
-    return HttpResponse("Error procesando webhook", status=400)
-
-# =======RECUPERACIÓN DE CONTRASEÑA CON CORREO REAL=========
-@never_cache
+# ============================================================
+# RECUPERACIÓN DE CONTRASEÑA (con correo real)
+# ============================================================
 def recuperar_contraseña(request):
     if request.method == 'POST':
         email = request.POST.get('email')
-
         try:
             user = User.objects.get(email=email)
         except User.DoesNotExist:
             messages.error(request, "El correo ingresado no está registrado.")
             return render(request, 'usuarios/recuperar_contraseña.html')
-
+        
         signer = TimestampSigner()
         token = signer.sign(str(user.pk))
-
-        reset_url = request.build_absolute_uri(
-            reverse('usuarios:cambiar_con_token', args=[token])
-        )
-
-        html_message = render_to_string(
-            'usuarios/msg_correo.html',
-            {
-                'username': user.username,
-                'reset_url': reset_url,
-                'site_name': 'PQRS Inteligente',
-            }
-        )
-
+        reset_url = request.build_absolute_uri(reverse('usuarios:cambiar_con_token', args=[token]))
+        
+        html_message = render_to_string('usuarios/msg_correo.html', {
+            'username': user.username,
+            'reset_url': reset_url,
+            'site_name': 'PQRS Inteligente',
+        })
         subject = "Recuperación de contraseña - PQRS Inteligente"
         text_message = strip_tags(html_message)
-
+        
         try:
             email_msg = EmailMultiAlternatives(
                 subject=subject,
@@ -381,77 +342,34 @@ def recuperar_contraseña(request):
                 from_email=settings.DEFAULT_FROM_EMAIL,
                 to=[email]
             )
-
-            email_msg.attach_alternative(html_message, "text/html")
+            email_msg.encoding = 'utf-8'
             email_msg.send()
-
-            messages.success(
-                request,
-                "Se ha enviado un enlace de recuperación a tu correo."
-            )
-
+            messages.success(request, "Se ha enviado un enlace de recuperación a tu correo.")
             return redirect('usuarios:login')
-
         except Exception as e:
-            messages.error(
-                request,
-                f"Error al enviar el correo: {str(e)}"
-            )
-
-            return render(
-                request,
-                'usuarios/recuperar_contraseña.html'
-            )
-
+            messages.error(request, f"Error al enviar el correo: {str(e)}")
+            return render(request, 'usuarios/recuperar_contraseña.html')
+    
     return render(request, 'usuarios/recuperar_contraseña.html')
 
-
 def cambiar_con_token(request, token):
-
     signer = TimestampSigner()
-
     try:
         user_id = signer.unsign(token, max_age=3600)
-
         usuario = get_object_or_404(User, pk=user_id)
-
     except (BadSignature, SignatureExpired):
-
-        messages.error(
-            request,
-            "El enlace de recuperación es inválido o ha expirado."
-        )
-
+        messages.error(request, "El enlace de recuperación es inválido o ha expirado.")
         return redirect('usuarios:recuperar_contraseña')
-
+    
     if request.method == 'POST':
-
         new_password = request.POST.get('new_password')
         confirm_password = request.POST.get('confirm_password')
-
         if new_password != confirm_password:
-
-            messages.error(
-                request,
-                "Las contraseñas no coinciden."
-            )
-
-            return render(
-                request,
-                'usuarios/cambiar_con_token.html'
-            )
-
+            messages.error(request, "Las contraseñas no coinciden.")
+            return render(request, 'usuarios/cambiar_con_token.html')
         usuario.password = make_password(new_password)
         usuario.save()
-
-        messages.success(
-            request,
-            "Contraseña cambiada correctamente. Inicia sesión."
-        )
-
+        messages.success(request, "Contraseña cambiada correctamente. Inicia sesión.")
         return redirect('usuarios:login')
-
-    return render(
-        request,
-        'usuarios/cambiar_con_token.html'
-    )
+    
+    return render(request, 'usuarios/cambiar_con_token.html')

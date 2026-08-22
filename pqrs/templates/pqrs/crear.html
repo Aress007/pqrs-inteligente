@@ -16,30 +16,38 @@
 {% block content %}
 <div class="row justify-content-center">
     <div class="col-md-8 col-lg-7">
-        <div class="card shadow border-0 rounded-4">
-            <div class="card-header bg-primary text-white rounded-top-4 py-3">
+        <div class="card border-0 shadow-lg rounded-4">
+            <div class="card-header bg-primary text-white rounded-top-4 py-3" style="background: linear-gradient(135deg, #1a3a6b, #2756a8);">
                 <h1 class="h4 mb-0 fw-bold">
                     <i class="bi bi-pencil-square me-2"></i> PQRS Inteligente
                 </h1>
-                <small>Complete el formulario. El sistema clasificará su solicitud automáticamente con IA.</small>
+                <small class="opacity-75">Complete el formulario. El sistema clasificará su solicitud automáticamente con IA.</small>
             </div>
             <div class="card-body p-4">
-                <div class="alert alert-info d-flex align-items-center mb-4">
-                    <i class="bi bi-robot me-2 fs-5"></i>
-                    <span>La IA <strong>Hugging Face</strong> clasificará su solicitud.</span>
+                <!-- Alerta IA -->
+                <div class="alert alert-info d-flex align-items-center mb-4 border-0 rounded-4" style="background-color: #dbeafe;">
+                    <i class="bi bi-robot me-2 fs-5 text-primary"></i>
+                    <span>La IA <strong class="text-primary">Hugging Face</strong> clasificará su solicitud en tiempo real.</span>
                 </div>
 
                 <form method="POST" id="formPQRS" enctype="multipart/form-data">
                     {% csrf_token %}
+
+                    <!-- Asunto -->
                     <div class="mb-3">
-                        <label for="titulo" class="form-label fw-semibold">Asunto *</label>
-                        <input type="text" name="titulo" id="titulo" class="form-control" maxlength="200" required>
+                        <label for="titulo" class="form-label fw-semibold">
+                            <i class="bi bi-card-heading me-1"></i>Asunto *
+                        </label>
+                        <input type="text" name="titulo" id="titulo" class="form-control form-control-lg" maxlength="200" placeholder="Escribe un título breve y claro" required>
                     </div>
 
+                    <!-- Empresa destino -->
                     {% if not es_cliente %}
                         <div class="mb-3">
-                            <label class="form-label fw-semibold">Empresa destino *</label>
-                            <select name="empresa" class="form-select" required>
+                            <label class="form-label fw-semibold">
+                                <i class="bi bi-building me-1"></i>Empresa destino *
+                            </label>
+                            <select name="empresa" class="form-select form-select-lg" required>
                                 {% for e in empresas %}
                                     <option value="{{ e.id }}" selected>{{ e.nombre_empresa }}</option>
                                 {% endfor %}
@@ -48,8 +56,10 @@
                         </div>
                     {% else %}
                         <div class="mb-3">
-                            <label class="form-label fw-semibold">Seleccione la empresa a la que dirige su PQRS *</label>
-                            <select name="empresa" class="form-select" required>
+                            <label class="form-label fw-semibold">
+                                <i class="bi bi-building me-1"></i>Seleccione la empresa a la que dirige su PQRS *
+                            </label>
+                            <select name="empresa" class="form-select form-select-lg" required>
                                 <option value="">-- Elija una empresa --</option>
                                 {% for e in empresas %}
                                     <option value="{{ e.id }}">{{ e.nombre_empresa }}</option>
@@ -58,21 +68,26 @@
                         </div>
                     {% endif %}
 
+                    <!-- Descripción -->
                     <div class="mb-3">
-                        <label for="descripcion" class="form-label fw-semibold">Descripción *</label>
-                        <textarea name="descripcion" id="descripcion" class="form-control" rows="5" required></textarea>
+                        <label for="descripcion" class="form-label fw-semibold">
+                            <i class="bi bi-text-paragraph me-1"></i>Descripción *
+                        </label>
+                        <textarea name="descripcion" id="descripcion" class="form-control" rows="5" placeholder="Describe detalladamente tu solicitud..." required></textarea>
                     </div>
 
-                    <div class="mb-3">
-                        <label for="archivo" class="form-label">Archivo adjunto (opcional)</label>
+                    <!-- Archivo adjunto -->
+                    <div class="mb-4">
+                        <label for="archivo" class="form-label fw-semibold">
+                            <i class="bi bi-paperclip me-1"></i>Archivo adjunto <span class="text-muted fw-normal">(opcional)</span>
+                        </label>
                         <input type="file" name="archivo" id="archivo" class="form-control" accept="image/*,application/pdf,.doc,.docx,.txt">
+                        <div class="form-text">Formatos permitidos: JPG, PNG, PDF, DOC, DOCX, TXT</div>
                     </div>
 
+                    <!-- Botón enviar -->
                     <div class="d-grid">
-                        <button type="submit"
-                                class="btn btn-success btn-lg fw-bold"
-                                id="btnEnviar"
-                                title="Enviar la PQRS">
+                        <button type="submit" class="btn btn-success btn-lg fw-bold rounded-pill py-3" id="btnEnviar">
                             <i class="bi bi-send-fill me-2"></i> Enviar Solicitud
                         </button>
                     </div>

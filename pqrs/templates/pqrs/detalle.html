@@ -3,63 +3,155 @@
 {% block title %}Detalle PQRS{% endblock %}
 
 {% block breadcrumb %}
-    <li class="breadcrumb-item"><a href="{% if user.perfil.rol == 'empresa' %}{% url 'pqrs:dashboard' %}{% else %}{% url 'pqrs:mis_solicitudes' %}{% endif %}">Mis Solicitudes</a></li>
+    <li class="breadcrumb-item">
+        <a href="{% if user.perfil.rol == 'empresa' %}{% url 'pqrs:dashboard' %}{% else %}{% url 'pqrs:mis_solicitudes' %}{% endif %}">
+            Mis Solicitudes
+        </a>
+    </li>
     <li class="breadcrumb-item active">Detalle</li>
 {% endblock %}
 
 {% block content %}
 <div class="container">
-<div class="mb-3">
-    <a href="{% if user.perfil.rol == 'empresa' %}{% url 'pqrs:dashboard' %}{% else %}{% url 'pqrs:mis_solicitudes' %}{% endif %}" class="btn btn-secondary">
-        <i class="bi bi-arrow-left"></i> Volver
-    </a>
-</div>
 
-    <div class="card mb-4">
-        <div class="card-header">
-            <strong>{{ pqrs.codigo_radicado }}</strong> - {{ pqrs.asunto }}
-        </div>
-        <div class="card-body">
-            <p><strong>Descripción:</strong> {{ pqrs.descripcion }}</p>
-            <p><strong>Empresa destino:</strong> {{ pqrs.id_empresa.nombre_empresa }}</p>
-            <p><strong>Tipo IA:</strong> {{ pqrs.tipo_detectado|capfirst }}</p>
-            <p><strong>Estado:</strong> 
-                <span class="badge {% if pqrs.estado == 'Pendiente' %}bg-warning{% elif pqrs.estado == 'En Proceso' %}bg-info{% else %}bg-success{% endif %}">
+    <!-- ============================================================
+         BOTÓN VOLVER
+    ============================================================ -->
+    <div class="mb-3">
+        <a href="{% if user.perfil.rol == 'empresa' %}{% url 'pqrs:dashboard' %}{% else %}{% url 'pqrs:mis_solicitudes' %}{% endif %}" class="btn btn-outline-secondary rounded-pill px-4">
+            <i class="bi bi-arrow-left me-1"></i> Volver
+        </a>
+    </div>
+
+    <!-- ============================================================
+         INFORMACIÓN DE LA PQRS
+    ============================================================ -->
+    <div class="card border-0 shadow-sm rounded-4 mb-4">
+        <div class="card-header bg-white border-0 pt-4 pb-0">
+            <div class="d-flex flex-wrap align-items-center gap-3">
+                <code class="small fw-bold" style="color: var(--azul-medio);">{{ pqrs.codigo_radicado }}</code>
+                <span class="badge bg-secondary bg-opacity-10 text-secondary fw-semibold px-3 py-1 rounded-pill">{{ pqrs.tipo_detectado|capfirst }}</span>
+                <span class="badge {% if pqrs.estado == 'Pendiente' %}bg-warning bg-opacity-10 text-warning{% elif pqrs.estado == 'En Proceso' %}bg-info bg-opacity-10 text-info{% else %}bg-success bg-opacity-10 text-success{% endif %} fw-semibold px-3 py-1 rounded-pill">
                     {{ pqrs.estado }}
                 </span>
-            </p>
-            <p><strong>Fecha:</strong> {{ pqrs.fecha_creacion|date:"d/m/Y H:i" }}</p>
+            </div>
+            <h3 class="h5 fw-bold mt-2" style="color: var(--texto-oscuro);">{{ pqrs.asunto }}</h3>
+        </div>
+        <div class="card-body">
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <p><strong>Descripción:</strong><br>{{ pqrs.descripcion }}</p>
+                </div>
+                <div class="col-md-6">
+                    <p><strong>Empresa destino:</strong><br>{{ pqrs.id_empresa.nombre_empresa }}</p>
+                    <p><strong>Sentimiento:</strong>
+                        {% if pqrs.sentimiento == 'positivo' %}
+                            <span class="badge bg-success bg-opacity-10 text-success px-3 py-1 rounded-pill"><i class="bi bi-emoji-smile"></i> Positivo</span>
+                        {% elif pqrs.sentimiento == 'negativo' %}
+                            <span class="badge bg-danger bg-opacity-10 text-danger px-3 py-1 rounded-pill"><i class="bi bi-emoji-frown"></i> Negativo</span>
+                        {% else %}
+                            <span class="badge bg-secondary bg-opacity-10 text-secondary px-3 py-1 rounded-pill"><i class="bi bi-emoji-neutral"></i> Neutral</span>
+                        {% endif %}
+                    </p>
+                    <p><strong>Fecha de radicación:</strong> {{ pqrs.fecha_creacion|date:"d/m/Y H:i" }}</p>
+                    {% if pqrs.fecha_cierre %}
+                        <p><strong>Fecha de cierre:</strong> {{ pqrs.fecha_cierre|date:"d/m/Y H:i" }}</p>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Archivo adjunto -->
             {% if pqrs.archivo %}
-                <p><strong>Archivo adjunto:</strong>
-                    <a href="{{ pqrs.archivo.url }}" target="_blank" class="btn btn-sm btn-outline-primary">Ver</a>
-                    <a href="{% url 'pqrs:descargar_archivo' pqrs.id %}" class="btn btn-sm btn-outline-success">Descargar</a>
-                </p>
+                <div class="mt-3">
+                    <strong>Archivo adjunto:</strong>
+                    <a href="{{ pqrs.archivo.url }}" target="_blank" class="btn btn-sm btn-outline-primary rounded-pill">
+                        <i class="bi bi-eye"></i> Ver
+                    </a>
+                    <a href="{% url 'pqrs:descargar_archivo' pqrs.id %}" class="btn btn-sm btn-outline-success rounded-pill">
+                        <i class="bi bi-download"></i> Descargar
+                    </a>
+                </div>
             {% endif %}
         </div>
     </div>
 
-    <div class="card mb-4">
-        <div class="card-header">Respuestas</div>
+    <!-- ============================================================
+         SLA - CONTROL DE TIEMPO (solo si no está resuelta)
+    ============================================================ -->
+    {% if pqrs.estado != 'Resuelta' and tiempo_transcurrido %}
+        <div class="card border-0 shadow-sm rounded-4 mb-4
+            {% if alerta == 'vencida' %}border-danger border-2{% elif alerta == 'proxima_a_vencer' %}border-warning border-2{% else %}border-success border-2{% endif %}">
+            <div class="card-body">
+                <div class="d-flex flex-wrap justify-content-between align-items-center mb-2">
+                    <div>
+                        <strong><i class="bi bi-stopwatch me-1"></i>Control de tiempo SLA</strong>
+                    </div>
+                    <div>
+                        {% if alerta == 'vencida' %}
+                            <span class="badge bg-danger rounded-pill px-3 py-2">🔴 Vencida</span>
+                        {% elif alerta == 'proxima_a_vencer' %}
+                            <span class="badge bg-warning text-dark rounded-pill px-3 py-2">🟡 Próxima a vencer</span>
+                        {% else %}
+                            <span class="badge bg-success rounded-pill px-3 py-2">🟢 Dentro del plazo</span>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="mb-2">
+                    <strong>Tiempo transcurrido:</strong> {{ tiempo_transcurrido }}
+                </div>
+                <div class="progress mb-2" style="height: 20px;">
+                    <div class="progress-bar
+                        {% if alerta == 'vencida' %}bg-danger{% elif alerta == 'proxima_a_vencer' %}bg-warning text-dark{% else %}bg-success{% endif %}"
+                        role="progressbar" style="width: {{ porcentaje }}%;" aria-valuenow="{{ porcentaje }}" aria-valuemin="0" aria-valuemax="100">
+                        {{ porcentaje }}%
+                    </div>
+                </div>
+                <div class="d-flex justify-content-between small text-muted">
+                    <span><i class="bi bi-hourglass-split"></i> Restante: {{ tiempo_restante }}</span>
+                    <span>SLA: 72 horas (3 días)</span>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+
+    <!-- ============================================================
+         RESPUESTAS
+    ============================================================ -->
+    <div class="card border-0 shadow-sm rounded-4 mb-4">
+        <div class="card-header bg-white border-0 pt-4 pb-0">
+            <h5 class="fw-semibold mb-0" style="color: var(--texto-oscuro);">
+                <i class="bi bi-chat-left-text me-2"></i>Respuestas
+            </h5>
+        </div>
         <div class="card-body">
             {% if respuestas %}
                 {% for r in respuestas %}
-                    <div class="border-bottom mb-3 pb-2">
-                        <div class="d-flex justify-content-between align-items-start">
+                    <div class="border-bottom pb-3 mb-3">
+                        <div class="d-flex flex-wrap justify-content-between align-items-start">
                             <div>
-                                <strong>{{ r.id_usuario_responde.username }}</strong> - {{ r.fecha_respuesta|date:"d/m/Y H:i" }}
+                                <strong>{{ r.id_usuario_responde.username }}</strong>
+                                <span class="text-muted small ms-2">{{ r.fecha_respuesta|date:"d/m/Y H:i" }}</span>
                             </div>
                             {% if user == r.id_usuario_responde %}
                                 <div>
-                                    <a href="{% url 'pqrs:editar_respuesta' r.id %}" class="btn btn-sm btn-outline-primary">
+                                    <a href="{% url 'pqrs:editar_respuesta' r.id %}" class="btn btn-sm btn-outline-primary rounded-pill">
                                         <i class="bi bi-pencil"></i> Editar
                                     </a>
-                                    <button type="button" class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#modalEliminar{{ r.id }}">
+                                    <button type="button" class="btn btn-sm btn-outline-danger rounded-pill" data-bs-toggle="modal" data-bs-target="#modalEliminar{{ r.id }}">
                                         <i class="bi bi-trash"></i> Eliminar
                                     </button>
                                 </div>
                             {% endif %}
                         </div>
-                        <p class="mt-2">{{ r.texto_respuesta|linebreaks }}</p>
+                        <p class="mt-2 mb-1">{{ r.texto_respuesta|linebreaks }}</p>
+                        {% if r.archivo %}
+                            <div>
+                                <strong>Archivo adjunto:</strong>
+                                <a href="{{ r.archivo.url }}" target="_blank" class="btn btn-sm btn-outline-primary rounded-pill">
+                                    <i class="bi bi-paperclip"></i> Ver
+                                </a>
+                            </div>
+                        {% endif %}
                     </div>
 
                     <!-- Modal de confirmación para eliminar -->
@@ -75,7 +167,7 @@
                                 </div>
                                 <div class="modal-footer">
                                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                                    <form method="POST" action="{% url 'pqrs:eliminar_respuesta' r.id %}" style="display:inline;">
+                                    <form method="POST" action="{% url 'pqrs:eliminar_respuesta' r.id %}" style="display: inline;">
                                         {% csrf_token %}
                                         <button type="submit" class="btn btn-danger">Eliminar</button>
                                     </form>
@@ -85,51 +177,102 @@
                     </div>
                 {% endfor %}
             {% else %}
-                <p>No hay respuestas aún.</p>
+                <p class="text-muted">No hay respuestas aún.</p>
             {% endif %}
         </div>
     </div>
 
-    {% if user.perfil.rol == 'empresa' or pqrs.id_usuario_creador == user %}
-    <div class="card">
-        <div class="card-header">Agregar respuesta</div>
+    <!-- ============================================================
+         AGREGAR RESPUESTA (solo si no está resuelta)
+    ============================================================ -->
+    {% if pqrs.estado != 'Resuelta' %}
+        {% if user.perfil.rol == 'empresa' or pqrs.id_usuario_creador == user %}
+            <div class="card border-0 shadow-sm rounded-4 mb-4">
+                <div class="card-header bg-white border-0 pt-4 pb-0">
+                    <h5 class="fw-semibold mb-0" style="color: var(--texto-oscuro);">
+                        <i class="bi bi-reply me-2"></i>Agregar respuesta
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <form method="POST" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        <textarea name="respuesta" rows="3" class="form-control mb-2" placeholder="Escribe tu respuesta..."></textarea>
+                        <input type="file" name="archivo" class="form-control mb-2" accept=".pdf,.jpg,.png,.doc,.docx,.txt">
+                        {% if user.perfil.rol == 'empresa' %}
+                            <select name="estado" class="form-select mb-2">
+                                <option value="Pendiente">Pendiente</option>
+                                <option value="En Proceso">En Proceso</option>
+                                <option value="Resuelta">Resuelta</option>
+                            </select>
+                        {% endif %}
+                        <button type="submit" class="btn btn-success rounded-pill px-4">
+                            <i class="bi bi-send me-1"></i> Enviar respuesta
+                        </button>
+                    </form>
+                </div>
+            </div>
+        {% endif %}
+    {% else %}
+        <div class="alert alert-success rounded-4 mb-4">
+            <i class="bi bi-check-circle me-2"></i>
+            <strong>Esta PQRS está resuelta y cerrada.</strong> No se permiten más respuestas.
+            {% if pqrs.fecha_cierre %}
+                <br><small>Cerrada el {{ pqrs.fecha_cierre|date:"d/m/Y H:i" }}</small>
+            {% endif %}
+        </div>
+    {% endif %}
+
+    <!-- ============================================================
+         HISTORIAL DE TRAZABILIDAD
+    ============================================================ -->
+    <div class="card border-0 shadow-sm rounded-4 mb-4">
+        <div class="card-header bg-white border-0 pt-4 pb-0">
+            <h5 class="fw-semibold mb-0" style="color: var(--texto-oscuro);">
+                <i class="bi bi-clock-history me-2"></i>Historial de trazabilidad
+            </h5>
+        </div>
         <div class="card-body">
-            <form method="POST">
-                {% csrf_token %}
-                <textarea name="respuesta" rows="3" class="form-control mb-2" placeholder="Escribe tu respuesta..."></textarea>
-                {% if user.perfil.rol == 'empresa' %}
-                    <select name="estado" class="form-select mb-2">
-                        <option value="Pendiente">Pendiente</option>
-                        <option value="En Proceso">En Proceso</option>
-                        <option value="Resuelta">Resuelta</option>
-                    </select>
-                {% endif %}
-                <button type="submit" class="btn btn-success">Enviar respuesta</button>
-            </form>
+            {% if pqrs.historial.all %}
+                <div style="position: relative; padding-left: 30px;">
+                    <div style="position: absolute; left: 10px; top: 0; bottom: 0; width: 2px; background: #dee2e6;"></div>
+                    {% for h in pqrs.historial.all|dictsort:"fecha" %}
+                        <div style="position: relative; margin-bottom: 20px; padding-left: 10px;">
+                            <span style="position: absolute; left: -24px; top: 4px; width: 16px; height: 16px; border-radius: 50%;
+                                background: {% if h.estado_nuevo == 'Resuelta' or 'cerrada' in h.comentario|lower %} #28a745 {% elif 'Respuesta' in h.comentario %} #17a2b8 {% else %} #007bff {% endif %};
+                                border: 2px solid white; box-shadow: 0 0 0 2px {% if h.estado_nuevo == 'Resuelta' or 'cerrada' in h.comentario|lower %} #28a745 {% elif 'Respuesta' in h.comentario %} #17a2b8 {% else %} #007bff {% endif %};">
+                            </span>
+                            <div class="d-flex flex-wrap justify-content-between align-items-start">
+                                <div>
+                                    <strong>
+                                        {% if 'creada' in h.comentario|lower %}
+                                            <i class="bi bi-plus-circle text-success"></i>
+                                        {% elif 'Respuesta' in h.comentario %}
+                                            <i class="bi bi-reply text-info"></i>
+                                        {% elif 'cerrada' in h.comentario|lower %}
+                                            <i class="bi bi-check-circle text-success"></i>
+                                        {% else %}
+                                            <i class="bi bi-arrow-repeat text-primary"></i>
+                                        {% endif %}
+                                        {{ h.comentario }}
+                                    </strong>
+                                    <br>
+                                    <small class="text-muted">
+                                        <i class="bi bi-person"></i> {{ h.usuario.username }}
+                                        <i class="bi bi-clock ms-2"></i> {{ h.fecha|date:"d/m/Y H:i" }}
+                                    </small>
+                                </div>
+                                <span class="badge {% if h.estado_nuevo == 'Resuelta' %}bg-success{% else %}bg-secondary{% endif %}">
+                                    {{ h.estado_nuevo|default:"N/A" }}
+                                </span>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <p class="text-muted">No hay eventos registrados para esta PQRS.</p>
+            {% endif %}
         </div>
     </div>
-    {% endif %}
+
 </div>
 {% endblock %}
-
-<!-- Historial de cambios -->
-<div class="card mb-4">
-    <div class="card-header">Historial de cambios de estado</div>
-    <div class="card-body">
-        {% if pqrs.historial.all %}
-            <ul class="list-unstyled">
-                {% for h in pqrs.historial.all|dictsort:"fecha" %}
-                <li>
-                    <strong>{{ h.fecha|date:"d/m/Y H:i" }}</strong> - 
-                    {{ h.usuario.username }} cambió de 
-                    <span class="badge bg-secondary">{{ h.estado_anterior|default:"Nuevo" }}</span> 
-                    a <span class="badge bg-primary">{{ h.estado_nuevo }}</span>
-                    {% if h.comentario %}<br><small>{{ h.comentario }}</small>{% endif %}
-                </li>
-                {% endfor %}
-            </ul>
-        {% else %}
-            <p>No hay cambios de estado registrados.</p>
-        {% endif %}
-    </div>
-</div>

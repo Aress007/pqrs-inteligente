@@ -1,0 +1,106 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Funciones - Empresa{% endblock %}
+
+{% block breadcrumb %}
+    <li class="breadcrumb-item active">Funciones</li>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <!-- Botón Volver -->
+    <div class="mb-3">
+        <a href="{% url 'pqrs:dashboard' %}" class="btn btn-outline-secondary rounded-pill px-4">
+            <i class="bi bi-arrow-left me-1"></i> Volver al Dashboard
+        </a>
+    </div>
+
+    <!-- Encabezado -->
+    <h1 class="h3 fw-bold mb-4" style="color: var(--texto-oscuro);">
+        <i class="bi bi-grid me-2"></i>Panel de Funciones
+    </h1>
+
+    <div class="row g-4">
+        <!-- Tarjeta: Respaldo de BD -->
+        <div class="col-md-6">
+            <div class="card border-0 shadow-sm rounded-4 h-100">
+                <div class="card-body p-4 d-flex flex-column">
+                    <div class="d-flex align-items-center gap-3 mb-3">
+                        <div class="bg-primary bg-opacity-10 rounded-3 p-3">
+                            <i class="bi bi-download fs-3 text-primary"></i>
+                        </div>
+                        <div>
+                            <h5 class="card-title fw-bold mb-0">Respaldo de BD</h5>
+                            <small class="text-muted">Copia de seguridad completa</small>
+                        </div>
+                    </div>
+                    <p class="card-text text-muted flex-grow-1">
+                        Descarga un archivo JSON con todos los datos del sistema: PQRS, usuarios, respuestas, historial y más.
+                    </p>
+                    <a href="{% url 'core:respaldar_bd' %}" class="btn btn-primary rounded-pill px-4 align-self-start">
+                        <i class="bi bi-download me-1"></i> Descargar respaldo
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tarjeta: Restaurar BD -->
+        <div class="col-md-6">
+            <div class="card border-0 shadow-sm rounded-4 h-100">
+                <div class="card-body p-4 d-flex flex-column">
+                    <div class="d-flex align-items-center gap-3 mb-3">
+                        <div class="bg-warning bg-opacity-10 rounded-3 p-3">
+                            <i class="bi bi-upload fs-3 text-warning"></i>
+                        </div>
+                        <div>
+                            <h5 class="card-title fw-bold mb-0">Restaurar BD</h5>
+                            <small class="text-muted">Recuperar desde respaldo</small>
+                        </div>
+                    </div>
+                    <p class="card-text text-muted flex-grow-1">
+                        Carga un archivo JSON de respaldo para restaurar la base de datos. Esta acción reemplazará los datos actuales.
+                    </p>
+                    <a href="{% url 'core:restaurar_bd' %}" class="btn btn-warning rounded-pill px-4 align-self-start text-white">
+                        <i class="bi bi-upload me-1"></i> Restaurar
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Información del sistema (opcional) -->
+    <div class="card border-0 shadow-sm rounded-4 mt-4">
+        <div class="card-body p-4">
+            <h6 class="fw-bold mb-3" style="color: var(--texto-oscuro);">
+                <i class="bi bi-info-circle me-2"></i>Información del sistema
+            </h6>
+            <div class="row g-3">
+                <div class="col-md-3">
+                    <div class="bg-light rounded-3 p-3 text-center">
+                        <small class="text-muted d-block">Versión</small>
+                        <span class="fw-bold">v2.4.1</span>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="bg-light rounded-3 p-3 text-center">
+                        <small class="text-muted d-block">Plan activo</small>
+                        <span class="fw-bold">Empresa</span>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="bg-light rounded-3 p-3 text-center">
+                        <small class="text-muted d-block">PQRS este mes</small>
+                        <span class="fw-bold">247 / Ilimitadas</span>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="bg-light rounded-3 p-3 text-center">
+                        <small class="text-muted d-block">Almacenamiento</small>
+                        <span class="fw-bold">1.8 GB / 50 GB</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

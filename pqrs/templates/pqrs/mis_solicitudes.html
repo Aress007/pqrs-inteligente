@@ -7,37 +7,144 @@
 {% endblock %}
 
 {% block content %}
-<div class="container-fluid">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h1 class="h3">Mis Solicitudes</h1>
-        <a href="{% url 'pqrs:crear' %}" class="btn btn-primary">Nueva PQRS</a>
+<div class="container-fluid px-0">
+
+    <!-- ============================================================
+         ENCABEZADO
+    ============================================================ -->
+    <div class="d-flex flex-wrap justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h3 fw-bold" style="color: var(--texto-oscuro);">Mis Solicitudes</h1>
+            <p class="text-muted small mb-0">Aquí están todas tus PQRS radicadas</p>
+        </div>
+        <a href="{% url 'pqrs:crear' %}" class="btn btn-primary rounded-pill px-4">
+            <i class="bi bi-plus-circle me-1"></i>Nueva PQRS
+        </a>
     </div>
+
+    <!-- ============================================================
+         TARJETAS DE RESUMEN (KPI Cards)
+    ============================================================ -->
     <div class="row g-4 mb-5">
-        <div class="col-md-3"><div class="card"><div class="card-body"><h5>Total</h5><h2>{{ total }}</h2></div></div></div>
-        <div class="col-md-3"><div class="card"><div class="card-body"><h5>Pendientes</h5><h2>{{ pendientes }}</h2></div></div></div>
-        <div class="col-md-3"><div class="card"><div class="card-body"><h5>En Proceso</h5><h2>{{ en_proceso }}</h2></div></div></div>
-        <div class="col-md-3"><div class="card"><div class="card-body"><h5>Resueltas</h5><h2>{{ resueltas }}</h2></div></div></div>
+        <div class="col-md-3 col-6">
+            <div class="card border-0 shadow-sm h-100 rounded-4">
+                <div class="card-body d-flex align-items-center gap-3">
+                    <div class="bg-primary bg-opacity-10 rounded-3 p-3">
+                        <i class="bi bi-envelope-paper fs-4 text-primary"></i>
+                    </div>
+                    <div>
+                        <h6 class="text-muted mb-1 small fw-semibold text-uppercase">Total</h6>
+                        <h2 class="display-6 fw-bold mb-0" style="color: var(--azul-principal);">{{ total }}</h2>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 col-6">
+            <div class="card border-0 shadow-sm h-100 rounded-4">
+                <div class="card-body d-flex align-items-center gap-3">
+                    <div class="bg-warning bg-opacity-10 rounded-3 p-3">
+                        <i class="bi bi-clock-history fs-4 text-warning"></i>
+                    </div>
+                    <div>
+                        <h6 class="text-muted mb-1 small fw-semibold text-uppercase">Pendientes</h6>
+                        <h2 class="display-6 fw-bold mb-0" style="color: #d97706;">{{ pendientes }}</h2>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 col-6">
+            <div class="card border-0 shadow-sm h-100 rounded-4">
+                <div class="card-body d-flex align-items-center gap-3">
+                    <div class="bg-info bg-opacity-10 rounded-3 p-3">
+                        <i class="bi bi-arrow-repeat fs-4 text-info"></i>
+                    </div>
+                    <div>
+                        <h6 class="text-muted mb-1 small fw-semibold text-uppercase">En Proceso</h6>
+                        <h2 class="display-6 fw-bold mb-0" style="color: #2563eb;">{{ en_proceso }}</h2>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 col-6">
+            <div class="card border-0 shadow-sm h-100 rounded-4">
+                <div class="card-body d-flex align-items-center gap-3">
+                    <div class="bg-success bg-opacity-10 rounded-3 p-3">
+                        <i class="bi bi-check2-circle fs-4 text-success"></i>
+                    </div>
+                    <div>
+                        <h6 class="text-muted mb-1 small fw-semibold text-uppercase">Resueltas</h6>
+                        <h2 class="display-6 fw-bold mb-0" style="color: #059669;">{{ resueltas }}</h2>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
-    <div class="card">
-        <div class="card-header">Mis PQRS radicadas</div>
+
+    <!-- ============================================================
+         TABLA DE SOLICITUDES
+    ============================================================ -->
+    <div class="card border-0 shadow-sm rounded-4">
+        <div class="card-header bg-white border-0 pt-4 pb-0">
+            <h5 class="fw-semibold mb-0" style="color: var(--texto-oscuro);">
+                <i class="bi bi-table me-2"></i>Mis PQRS radicadas
+            </h5>
+        </div>
         <div class="card-body">
             {% if pqrs_lista %}
-                <table class="table">
-                    <thead><tr><th>Radicado</th><th>Asunto</th><th>Estado</th><th>Fecha</th><th>Acciones</th></tr></thead>
-                    <tbody>
-                        {% for p in pqrs_lista %}
-                        <tr>
-                            <td>{{ p.codigo_radicado }}</td>
-                            <td>{{ p.asunto }}</td>
-                            <td>{% if p.estado == 'Pendiente' %}<span class="badge bg-warning">Pendiente</span>{% elif p.estado == 'En Proceso' %}<span class="badge bg-info">En Proceso</span>{% else %}<span class="badge bg-success">Resuelta</span>{% endif %}</td>
-                            <td>{{ p.fecha_creacion|date:"d/m/Y" }}</td>
-                            <td><a href="{% url 'pqrs:detalle' p.id %}" class="btn btn-sm btn-primary">Ver</a></td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th class="fw-semibold">Radicado</th>
+                                <th class="fw-semibold">Asunto</th>
+                                <th class="fw-semibold">Estado</th>
+                                <th class="fw-semibold">Fecha</th>
+                                <th class="fw-semibold text-center">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for p in pqrs_lista %}
+                            <tr>
+                                <td>
+                                    <code class="small" style="color: var(--azul-medio);">{{ p.codigo_radicado }}</code>
+                                </td>
+                                <td class="text-truncate" style="max-width: 200px;" title="{{ p.asunto }}">
+                                    {{ p.asunto|truncatechars:50 }}
+                                </td>
+                                <td>
+                                    {% if p.estado == 'Pendiente' %}
+                                        <span class="badge bg-warning bg-opacity-10 text-warning fw-semibold px-3 py-1 rounded-pill">
+                                            <i class="bi bi-clock me-1"></i>Pendiente
+                                        </span>
+                                    {% elif p.estado == 'En Proceso' %}
+                                        <span class="badge bg-info bg-opacity-10 text-info fw-semibold px-3 py-1 rounded-pill">
+                                            <i class="bi bi-arrow-repeat me-1"></i>En Proceso
+                                        </span>
+                                    {% else %}
+                                        <span class="badge bg-success bg-opacity-10 text-success fw-semibold px-3 py-1 rounded-pill">
+                                            <i class="bi bi-check-circle me-1"></i>Resuelta
+                                        </span>
+                                    {% endif %}
+                                </td>
+                                <td class="text-muted small">{{ p.fecha_creacion|date:"d/m/Y" }}</td>
+                                <td class="text-center">
+                                    <a href="{% url 'pqrs:detalle' p.id %}" class="btn btn-sm btn-outline-primary rounded-pill px-3">
+                                        <i class="bi bi-eye me-1"></i>Ver
+                                    </a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
             {% else %}
-                <p>No has radicado ninguna PQRS.</p>
+                <div class="text-center py-5">
+                    <i class="bi bi-inbox fs-1 text-muted"></i>
+                    <p class="text-muted mt-2">No has radicado ninguna PQRS.</p>
+                    <a href="{% url 'pqrs:crear' %}" class="btn btn-primary rounded-pill">
+                        <i class="bi bi-plus-circle me-1"></i>Crear mi primera PQRS
+                    </a>
+                </div>
             {% endif %}
         </div>
     </div>

@@ -1,159 +1,285 @@
 {% extends 'core/base.html' %}
 
-{% block title %}Ayuda - PQRS Inteligente{% endblock %}
+{% block title %}Manual de Usuario - PQRS Inteligente{% endblock %}
 
 {% block breadcrumb %}
-    <li class="breadcrumb-item active">Ayuda / Manual de Usuario</li>
+    <li class="breadcrumb-item active">Manual de Usuario</li>
 {% endblock %}
 
 {% block content %}
+
+<div class="mb-3">
+    <a href="{% if user.is_authenticated %}{% if user.perfil.rol == 'empresa' %}{% url 'pqrs:dashboard' %}{% else %}{% url 'pqrs:mis_solicitudes' %}{% endif %}{% else %}{% url 'core:inicio' %}{% endif %}" class="btn btn-secondary">
+        <i class="bi bi-arrow-left"></i> Volver
+    </a>
+</div>
+
 <div class="container">
-    <h1 class="h3 fw-bold mb-4">Manual de Usuario - PQRS Inteligente</h1>
+    <h1 class="h3 fw-bold mb-4" style="color: var(--azul-principal);">📘 Manual de Usuario</h1>
+    <p class="text-muted mb-5">Sistema de Gestión de PQRS con Inteligencia Artificial — PQRS Inteligente</p>
 
-    <div class="accordion" id="accordionAyuda">
-        <!-- 1. Registro -->
-        <div class="accordion-item">
-            <h2 class="accordion-header">
-                <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapse1">
-                    <i class="bi bi-person-plus me-2"></i> 1. ¿Cómo registrarse?
-                </button>
-            </h2>
-            <div id="collapse1" class="accordion-collapse collapse show" data-bs-parent="#accordionAyuda">
-                <div class="accordion-body">
-                    <p>Para registrarse en el sistema:</p>
-                    <ol>
-                        <li>Ve a la página principal y haz clic en <strong>"Regístrate"</strong>.</li>
-                        <li>Completa tus datos personales (usuario, correo, contraseña, teléfono).</li>
-                        <li>Si eres una <strong>empresa</strong>, marca la casilla "Registrarse como empresa" y completa los datos adicionales (nombre, NIT, plan).</li>
-                        <li>Si eres un <strong>cliente</strong>, no marques la casilla.</li>
-                        <li>Haz clic en <strong>"Registrarse"</strong>.</li>
-                    </ol>
-                </div>
-            </div>
+    <!-- ==========================================================
+         ÍNDICE
+    ========================================================== -->
+    <div class="card mb-5 border-0 shadow-sm">
+        <div class="card-header bg-primary text-white">
+            <h5 class="mb-0"><i class="bi bi-list-ul me-2"></i>Índice de contenido</h5>
         </div>
-
-        <!-- 2. Iniciar sesión -->
-        <div class="accordion-item">
-            <h2 class="accordion-header">
-                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse2">
-                    <i class="bi bi-box-arrow-in-right me-2"></i> 2. ¿Cómo iniciar sesión?
-                </button>
-            </h2>
-            <div id="collapse2" class="accordion-collapse collapse" data-bs-parent="#accordionAyuda">
-                <div class="accordion-body">
-                    <ol>
-                        <li>Ve a la página de <strong>Iniciar Sesión</strong>.</li>
-                        <li>Ingresa tu <strong>nombre de usuario</strong> y <strong>contraseña</strong>.</li>
-                        <li>Haz clic en <strong>"Ingresar"</strong>.</li>
-                    </ol>
-                    <p>Si olvidaste tu contraseña, haz clic en <strong>"¿Olvidaste tu contraseña?"</strong> y sigue las instrucciones.</p>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-4">
+                    <ul class="list-unstyled">
+                        <li><a href="#seccion1" class="text-decoration-none">1. Introducción</a></li>
+                        <li><a href="#seccion2" class="text-decoration-none">2. Registro de usuario</a></li>
+                        <li><a href="#seccion3" class="text-decoration-none">3. Inicio de sesión</a></li>
+                        <li><a href="#seccion4" class="text-decoration-none">4. Recuperación de contraseña</a></li>
+                    </ul>
                 </div>
-            </div>
-        </div>
-
-        <!-- 3. Crear PQRS (cliente) -->
-        <div class="accordion-item">
-            <h2 class="accordion-header">
-                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse3">
-                    <i class="bi bi-pencil-square me-2"></i> 3. ¿Cómo crear una PQRS? (cliente)
-                </button>
-            </h2>
-            <div id="collapse3" class="accordion-collapse collapse" data-bs-parent="#accordionAyuda">
-                <div class="accordion-body">
-                    <ol>
-                        <li>Inicia sesión como <strong>cliente</strong>.</li>
-                        <li>Ve a <strong>"Mis Solicitudes"</strong> y haz clic en <strong>"Nueva PQRS"</strong>.</li>
-                        <li>Completa el formulario: <strong>asunto</strong>, <strong>descripción</strong> y selecciona la <strong>empresa destino</strong>.</li>
-                        <li>Opcionalmente, adjunta un archivo.</li>
-                        <li>Haz clic en <strong>"Enviar Solicitud"</strong>.</li>
-                        <li>El sistema clasificará automáticamente tu PQRS con IA.</li>
-                    </ol>
+                <div class="col-md-4">
+                    <ul class="list-unstyled">
+                        <li><a href="#seccion5" class="text-decoration-none">5. Panel de usuario (cliente)</a></li>
+                        <li><a href="#seccion6" class="text-decoration-none">6. Creación de PQRS</a></li>
+                        <li><a href="#seccion7" class="text-decoration-none">7. Dashboard (empresa)</a></li>
+                        <li><a href="#seccion8" class="text-decoration-none">8. Gestión de PQRS (empresa)</a></li>
+                    </ul>
                 </div>
-            </div>
-        </div>
-
-        <!-- 4. Gestionar PQRS (empresa) -->
-        <div class="accordion-item">
-            <h2 class="accordion-header">
-                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse4">
-                    <i class="bi bi-speedometer2 me-2"></i> 4. ¿Cómo gestionar PQRS? (empresa)
-                </button>
-            </h2>
-            <div id="collapse4" class="accordion-collapse collapse" data-bs-parent="#accordionAyuda">
-                <div class="accordion-body">
-                    <ol>
-                        <li>Inicia sesión como <strong>empresa</strong>.</li>
-                        <li>Ve al <strong>Dashboard</strong> para ver todas las PQRS recibidas.</li>
-                        <li>Puedes <strong>filtrar</strong> por estado o buscar por radicado/asunto.</li>
-                        <li>Haz clic en <strong>"Gestionar"</strong> para ver el detalle de una PQRS.</li>
-                        <li>En el detalle, puedes <strong>responder</strong> y <strong>cambiar el estado</strong> (Pendiente, En Proceso, Resuelta).</li>
-                    </ol>
-                </div>
-            </div>
-        </div>
-
-        <!-- 5. Editar perfil -->
-        <div class="accordion-item">
-            <h2 class="accordion-header">
-                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse5">
-                    <i class="bi bi-person-gear me-2"></i> 5. ¿Cómo editar mi perfil?
-                </button>
-            </h2>
-            <div id="collapse5" class="accordion-collapse collapse" data-bs-parent="#accordionAyuda">
-                <div class="accordion-body">
-                    <ol>
-                        <li>Inicia sesión.</li>
-                        <li>Haz clic en tu nombre de usuario (arriba a la derecha).</li>
-                        <li>Selecciona <strong>"Mi perfil"</strong>.</li>
-                        <li>Actualiza tus datos y haz clic en <strong>"Guardar cambios"</strong>.</li>
-                        <li>Para cambiar tu contraseña, haz clic en <strong>"Cambiar contraseña"</strong>.</li>
-                    </ol>
-                </div>
-            </div>
-        </div>
-
-        <!-- 6. Recuperar contraseña -->
-        <div class="accordion-item">
-            <h2 class="accordion-header">
-                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse6">
-                    <i class="bi bi-key me-2"></i> 6. ¿Cómo recuperar mi contraseña?
-                </button>
-            </h2>
-            <div id="collapse6" class="accordion-collapse collapse" data-bs-parent="#accordionAyuda">
-                <div class="accordion-body">
-                    <ol>
-                        <li>En la página de inicio de sesión, haz clic en <strong>"¿Olvidaste tu contraseña?"</strong>.</li>
-                        <li>Ingresa tu <strong>correo electrónico</strong>.</li>
-                        <li>Recibirás un enlace de recuperación en tu correo.</li>
-                        <li>Haz clic en el enlace y sigue las instrucciones para establecer una nueva contraseña.</li>
-                    </ol>
-                </div>
-            </div>
-        </div>
-
-        <!-- 7. Pagos con ePayco -->
-        <div class="accordion-item">
-            <h2 class="accordion-header">
-                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse7">
-                    <i class="bi bi-credit-card me-2"></i> 7. ¿Cómo pagar un plan?
-                </button>
-            </h2>
-            <div id="collapse7" class="accordion-collapse collapse" data-bs-parent="#accordionAyuda">
-                <div class="accordion-body">
-                    <ol>
-                        <li>En la página principal, selecciona el plan <strong>"EMPRESA"</strong>.</li>
-                        <li>Haz clic en <strong>"Pagar con ePayco (PSE)"</strong>.</li>
-                        <li>Serás redirigido a la pasarela de pagos de ePayco.</li>
-                        <li>Completa los datos y confirma el pago (en modo prueba).</li>
-                        <li>Después del pago, serás redirigido a la página de éxito.</li>
-                    </ol>
+                <div class="col-md-4">
+                    <ul class="list-unstyled">
+                        <li><a href="#seccion9" class="text-decoration-none">9. Historial de trazabilidad</a></li>
+                        <li><a href="#seccion10" class="text-decoration-none">10. SLA y alertas</a></li>
+                        <li><a href="#seccion11" class="text-decoration-none">11. Chatbot</a></li>
+                        <li><a href="#seccion12" class="text-decoration-none">12. Editar perfil</a></li>
+                    </ul>
                 </div>
             </div>
         </div>
     </div>
 
-    <div class="mt-4 text-center">
+    <!-- ==========================================================
+         SECCIÓN 1: INTRODUCCIÓN
+    ========================================================== -->
+    <div id="seccion1" class="mb-5">
+        <h4 class="fw-bold" style="color: var(--azul-principal);">1. Introducción</h4>
+        <p><strong>PQRS Inteligente</strong> es un sistema SaaS que permite a las empresas gestionar de forma eficiente las Peticiones, Quejas, Reclamos y Sugerencias de sus clientes. El sistema utiliza <strong>Inteligencia Artificial</strong> para clasificar automáticamente cada solicitud y analizar el sentimiento del cliente, agilizando los tiempos de respuesta.</p>
+        <p><strong>Actores del sistema:</strong></p>
+        <ul>
+            <li><strong>Cliente:</strong> Usuario que radica PQRS y consulta el estado de sus solicitudes.</li>
+            <li><strong>Empresa:</strong> Usuario que recibe, gestiona y responde las PQRS.</li>
+        </ul>
+    </div>
+
+    <!-- ==========================================================
+         SECCIÓN 2: REGISTRO DE USUARIO
+    ========================================================== -->
+    <div id="seccion2" class="mb-5">
+        <h4 class="fw-bold" style="color: var(--azul-principal);">2. Registro de usuario</h4>
+        <p>Para registrarse en el sistema:</p>
+        <ol>
+            <li>Desde la página principal, haz clic en <strong>"Regístrate"</strong>.</li>
+            <li>Completa los datos personales: nombres, apellidos, cédula, usuario, correo, contraseña y teléfono.</li>
+            <li><strong>Si eres una empresa</strong>, marca la casilla <strong>"Registrarse como empresa"</strong> y completa los datos adicionales: nombre de la empresa, NIT, dirección y plan de suscripción.</li>
+            <li>Haz clic en <strong>"Registrarse"</strong>.</li>
+            <li>Si elegiste el plan "Empresa", serás redirigido a la pasarela de pago de ePayco para completar la suscripción.</li>
+        </ol>
+    </div>
+
+    <!-- ==========================================================
+         SECCIÓN 3: INICIO DE SESIÓN
+    ========================================================== -->
+    <div id="seccion3" class="mb-5">
+        <h4 class="fw-bold" style="color: var(--azul-principal);">3. Inicio de sesión</h4>
+        <ol>
+            <li>Ve a la página de <strong>Iniciar Sesión</strong> desde el menú principal.</li>
+            <li>Ingresa tu <strong>nombre de usuario</strong> y <strong>contraseña</strong>.</li>
+            <li>Haz clic en <strong>"Ingresar"</strong>.</li>
+            <li>Serás redirigido automáticamente al panel correspondiente según tu rol:
+                <ul>
+                    <li><strong>Empresa:</strong> Dashboard de gestión de PQRS.</li>
+                    <li><strong>Cliente:</strong> Mis Solicitudes.</li>
+                </ul>
+            </li>
+        </ol>
+        <div class="alert alert-info">
+            <i class="bi bi-info-circle me-2"></i>
+            Puedes mostrar/ocultar la contraseña haciendo clic en el ícono del ojo al lado del campo.
+        </div>
+    </div>
+
+    <!-- ==========================================================
+         SECCIÓN 4: RECUPERACIÓN DE CONTRASEÑA
+    ========================================================== -->
+    <div id="seccion4" class="mb-5">
+        <h4 class="fw-bold" style="color: var(--azul-principal);">4. Recuperación de contraseña</h4>
+        <ol>
+            <li>En la página de inicio de sesión, haz clic en <strong>"¿Olvidaste tu contraseña?"</strong>.</li>
+            <li>Ingresa el <strong>correo electrónico</strong> registrado en tu cuenta.</li>
+            <li>Recibirás un enlace de recuperación en tu correo (válido por 1 hora).</li>
+            <li>Haz clic en el enlace y establece una nueva contraseña.</li>
+            <li>Luego inicia sesión con tu nueva contraseña.</li>
+        </ol>
+    </div>
+
+    <!-- ==========================================================
+         SECCIÓN 5: PANEL DE USUARIO (CLIENTE)
+    ========================================================== -->
+    <div id="seccion5" class="mb-5">
+        <h4 class="fw-bold" style="color: var(--azul-principal);">5. Panel de usuario (cliente)</h4>
+        <p>El panel <strong>"Mis Solicitudes"</strong> permite al cliente:</p>
+        <ul>
+            <li><strong>Ver todas sus PQRS</strong> radicadas, con su estado actual (Pendiente, En Proceso, Resuelta).</li>
+            <li><strong>Ver el detalle</strong> de cada solicitud, incluyendo respuestas de la empresa y el historial de cambios.</li>
+            <li><strong>Crear una nueva PQRS</strong> haciendo clic en el botón <strong>"Nueva PQRS"</strong>.</li>
+            <li><strong>Ver el sentimiento</strong> detectado por IA en cada solicitud.</li>
+        </ul>
+        <p>También puedes acceder al <strong>Chatbot</strong> desde el botón flotante en la esquina inferior derecha para consultar el estado de tus PQRS.</p>
+    </div>
+
+    <!-- ==========================================================
+         SECCIÓN 6: CREACIÓN DE PQRS
+    ========================================================== -->
+    <div id="seccion6" class="mb-5">
+        <h4 class="fw-bold" style="color: var(--azul-principal);">6. Creación de PQRS</h4>
+        <p>Para radicar una nueva PQRS:</p>
+        <ol>
+            <li>Desde <strong>"Mis Solicitudes"</strong> (cliente) o <strong>"Dashboard"</strong> (empresa), haz clic en <strong>"Nueva PQRS"</strong>.</li>
+            <li>Completa el formulario:
+                <ul>
+                    <li><strong>Asunto:</strong> Título breve de la solicitud.</li>
+                    <li><strong>Empresa destino:</strong> Selecciona la empresa a la que va dirigida la PQRS.</li>
+                    <li><strong>Descripción:</strong> Explica detalladamente tu petición, queja, reclamo o sugerencia.</li>
+                    <li><strong>Archivo adjunto:</strong> Opcionalmente, adjunta un archivo (imagen, PDF, etc.).</li>
+                </ul>
+            </li>
+            <li>Haz clic en <strong>"Enviar Solicitud"</strong>.</li>
+            <li>El sistema <strong>clasificará automáticamente</strong> la PQRS mediante IA y analizará el sentimiento del texto.</li>
+            <li>La empresa destino recibirá una notificación por correo electrónico.</li>
+        </ol>
+        <div class="alert alert-success">
+            <i class="bi bi-robot me-2"></i>
+            La IA clasifica la PQRS en: <strong>Petición, Queja, Reclamo o Sugerencia</strong>.
+        </div>
+    </div>
+
+    <!-- ==========================================================
+         SECCIÓN 7: DASHBOARD (EMPRESA)
+    ========================================================== -->
+    <div id="seccion7" class="mb-5">
+        <h4 class="fw-bold" style="color: var(--azul-principal);">7. Dashboard (empresa)</h4>
+        <p>El dashboard de la empresa permite gestionar todas las PQRS recibidas:</p>
+        <ul>
+            <li><strong>Tarjetas de resumen:</strong> Total, Pendientes, En Proceso, Resueltas.</li>
+            <li><strong>Gráfico circular:</strong> Distribución de solicitudes por estado.</li>
+            <li><strong>Filtros de búsqueda:</strong> Busca por radicado, asunto o filtro por estado.</li>
+            <li><strong>Exportación a CSV:</strong> Descarga el listado de PQRS en formato Excel.</li>
+            <li><strong>Tabla de solicitudes:</strong> Lista todas las PQRS con acciones para gestionar cada una.</li>
+        </ul>
+    </div>
+
+    <!-- ==========================================================
+         SECCIÓN 8: GESTIÓN DE PQRS (EMPRESA)
+    ========================================================== -->
+    <div id="seccion8" class="mb-5">
+        <h4 class="fw-bold" style="color: var(--azul-principal);">8. Gestión de PQRS (empresa)</h4>
+        <p>Para gestionar una PQRS específica:</p>
+        <ol>
+            <li>Haz clic en <strong>"Gestionar"</strong> en la tabla del dashboard.</li>
+            <li>En el detalle de la PQRS, podrás:
+                <ul>
+                    <li><strong>Responder</strong> al cliente (con o sin archivo adjunto).</li>
+                    <li><strong>Cambiar el estado</strong> de la PQRS (Pendiente → En Proceso → Resuelta).</li>
+                    <li><strong>Ver el historial de cambios</strong> y la trazabilidad completa.</li>
+                    <li><strong>Editar o eliminar</strong> respuestas propias.</li>
+                </ul>
+            </li>
+        </ol>
+        <div class="alert alert-warning">
+            <i class="bi bi-exclamation-triangle me-2"></i>
+            Una vez que la PQRS se marque como <strong>"Resuelta"</strong>, se cierra automáticamente y no se permiten más respuestas.
+        </div>
+    </div>
+
+    <!-- ==========================================================
+         SECCIÓN 9: HISTORIAL DE TRAZABILIDAD
+    ========================================================== -->
+    <div id="seccion9" class="mb-5">
+        <h4 class="fw-bold" style="color: var(--azul-principal);">9. Historial de trazabilidad</h4>
+        <p>El historial de trazabilidad registra todos los eventos de una PQRS:</p>
+        <ul>
+            <li><strong>Creación</strong> de la PQRS (fecha y usuario).</li>
+            <li><strong>Respuestas</strong> enviadas por la empresa o el cliente.</li>
+            <li><strong>Cambios de estado</strong> (Pendiente → En Proceso → Resuelta).</li>
+            <li><strong>Cierre</strong> de la PQRS cuando se marca como Resuelta.</li>
+        </ul>
+        <p>El historial se muestra como una <strong>línea de tiempo</strong> en el detalle de la PQRS, con íconos que identifican cada tipo de evento.</p>
+    </div>
+
+    <!-- ==========================================================
+         SECCIÓN 10: SLA Y ALERTAS
+    ========================================================== -->
+    <div id="seccion10" class="mb-5">
+        <h4 class="fw-bold" style="color: var(--azul-principal);">10. SLA y alertas</h4>
+        <p><strong>SLA (Service Level Agreement)</strong> es el tiempo máximo comprometido para atender una PQRS. En este sistema, el SLA es de <strong>72 horas (3 días)</strong>.</p>
+        <p>El sistema muestra en el detalle de cada PQRS:</p>
+        <ul>
+            <li><strong>Tiempo transcurrido:</strong> Días y horas desde la radicación.</li>
+            <li><strong>Porcentaje del SLA</strong> consumido.</li>
+            <li><strong>Tiempo restante</strong> estimado.</li>
+            <li><strong>Alerta de estado</strong>:
+                <ul>
+                    <li><span class="badge bg-success">🟢 Dentro del plazo</span> — Menos del 80% del SLA consumido.</li>
+                    <li><span class="badge bg-warning text-dark">🟡 Próxima a vencer</span> — Entre 80% y 100% del SLA consumido.</li>
+                    <li><span class="badge bg-danger">🔴 Vencida</span> — SLA superado.</li>
+                </ul>
+            </li>
+        </ul>
+    </div>
+
+    <!-- ==========================================================
+         SECCIÓN 11: CHATBOT
+    ========================================================== -->
+    <div id="seccion11" class="mb-5">
+        <h4 class="fw-bold" style="color: var(--azul-principal);">11. Chatbot</h4>
+        <p>El sistema incluye un <strong>asistente virtual</strong> (chatbot) que puede ayudar a los usuarios:</p>
+        <ul>
+            <li>Consultar el <strong>estado</strong> de una PQRS por número de radicado.</li>
+            <li>Obtener información sobre <strong>respuestas</strong> recibidas.</li>
+            <li>Saber <strong>cómo crear</strong> una PQRS.</li>
+            <li>Responder preguntas generales sobre el sistema.</li>
+        </ul>
+        <p><strong>¿Cómo acceder?</strong> Haz clic en el botón flotante <i class="bi bi-robot"></i> en la esquina inferior derecha de la pantalla. El chatbot mantiene un historial de conversación personalizado por usuario.</p>
+    </div>
+
+    <!-- ==========================================================
+         SECCIÓN 12: EDITAR PERFIL
+    ========================================================== -->
+    <div id="seccion12" class="mb-5">
+        <h4 class="fw-bold" style="color: var(--azul-principal);">12. Editar perfil</h4>
+        <p>Para actualizar tus datos personales:</p>
+        <ol>
+            <li>Haz clic en tu nombre de usuario en la barra superior y selecciona <strong>"Mi perfil"</strong>.</li>
+            <li>En el formulario de edición podrás modificar:
+                <ul>
+                    <li>Nombre de usuario y correo electrónico.</li>
+                    <li>Nombres, apellidos, cédula y teléfono.</li>
+                    <li><strong>Foto de perfil</strong> (opcional).</li>
+                    <li><strong>Logo de la empresa</strong> (solo para empresas).</li>
+                </ul>
+            </li>
+            <li>Haz clic en <strong>"Guardar cambios"</strong>.</li>
+            <li>Para cambiar tu contraseña, ve a la pestaña <strong>"Cambiar contraseña"</strong> desde el mismo menú.</li>
+        </ol>
+    </div>
+
+    <!-- ==========================================================
+         FOOTER DEL MANUAL
+    ========================================================== -->
+    <div class="text-center mt-5 pt-4 border-top">
+        <p class="text-muted small">
+            <i class="bi bi-shield-lock me-1"></i>
+            PQRS Inteligente — Proyecto SENA Cúcuta 2026
+        </p>
         <a href="{% url 'core:inicio' %}" class="btn btn-primary">Volver al inicio</a>
     </div>
 </div>
+
 {% endblock %}

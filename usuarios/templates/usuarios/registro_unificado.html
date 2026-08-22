@@ -2,132 +2,254 @@
 
 {% block title %}Registro - PQRS Inteligente{% endblock %}
 
-{% block breadcrumb %}
-    <li class="breadcrumb-item active">Registro</li>
-{% endblock %}
-
 {% block content %}
-<div class="row justify-content-center">
-    <div class="col-md-8">
-        <div class="card shadow border-0 rounded-4">
-            <div class="card-header bg-primary text-white rounded-top-4 py-3">
-                <h2 class="h4 mb-0 fw-bold">Registro de Usuario</h2>
-                <small>Crea tu cuenta para comenzar</small>
+<div class="min-vh-100 d-flex align-items-stretch">
+
+    <!-- ==========================================================
+         COLUMNA IZQUIERDA - FONDO AZUL CON INFORMACIÓN
+    ========================================================== -->
+    <div class="d-none d-lg-flex flex-column justify-content-between p-5" style="flex: 1; background: linear-gradient(160deg, #0d1f3c 0%, #1a3a6b 50%, #2756a8 100%); color: white;">
+        <!-- Logo -->
+        <div>
+            <div class="d-flex align-items-center gap-2 mb-5">
+                <div class="bg-white/20 rounded-2 p-2">
+                    <i class="bi bi-shield-check fs-4"></i>
+                </div>
+                <span class="fw-bold fs-5">PQRS Inteligente</span>
             </div>
-            <div class="card-body p-4">
-                <form method="POST" id="registroForm">
-                    {% csrf_token %}
-                    
-                    <h5 class="fw-bold text-primary mb-3">Datos personales</h5>
-                    <div class="row mb-3">
-                        <div class="col-md-6">
-                            <label class="form-label">Nombres</label>
+        </div>
+
+        <!-- Texto central -->
+        <div>
+            <h1 class="display-4 fw-bold mb-4">Crea tu cuenta</h1>
+            <p class="fs-5 opacity-75 mb-5" style="max-width: 400px;">
+                Comienza a gestionar tus PQRS con el poder de la Inteligencia Artificial. Gratis por 14 días, sin compromiso.
+            </p>
+            <div class="d-flex flex-column gap-3">
+                <div class="d-flex align-items-center gap-2">
+                    <div class="bg-white/20 rounded-circle p-1">
+                        <i class="bi bi-check-lg"></i>
+                    </div>
+                    <span class="opacity-80">Clasificación automática por IA</span>
+                </div>
+                <div class="d-flex align-items-center gap-2">
+                    <div class="bg-white/20 rounded-circle p-1">
+                        <i class="bi bi-check-lg"></i>
+                    </div>
+                    <span class="opacity-80">Análisis de sentimiento en tiempo real</span>  <!-- Cambiar el place holder para adaptarse a cualquier función a futuro de la empresa como dependencias etc.) -->
+                </div>
+                <div class="d-flex align-items-center gap-2">
+                    <div class="bg-white/20 rounded-circle p-1">
+                        <i class="bi bi-check-lg"></i>
+                    </div>
+                    <span class="opacity-80">SLA y trazabilidad completa</span>
+                </div>
+                <div class="d-flex align-items-center gap-2">
+                    <div class="bg-white/20 rounded-circle p-1">
+                        <i class="bi bi-check-lg"></i>
+                    </div>
+                    <span class="opacity-80">Sin permanencia, cancela cuando quieras</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer izquierda -->
+        <div class="mt-5 opacity-50 small">
+            © 2026 PQRS Inteligente
+        </div>
+    </div>
+
+    <!-- ==========================================================
+         COLUMNA DERECHA - FORMULARIO DE REGISTRO
+    ========================================================== -->
+    <div class="d-flex align-items-center justify-content-center p-4 p-md-5" style="flex: 1.2; background: var(--gris-suave); overflow-y: auto;">
+        <div style="max-width: 480px; width: 100%; padding: 20px 0;">
+
+            <!-- Encabezado móvil -->
+            <div class="d-lg-none text-center mb-4">
+                <i class="bi bi-shield-check text-primary" style="font-size: 2.5rem;"></i>
+                <h2 class="fw-bold mt-2" style="color: var(--azul-principal);">PQRS Inteligente</h2>
+            </div>
+
+            <h2 class="fw-bold mb-1" style="color: var(--azul-principal);">Crear cuenta</h2>
+            <p class="text-muted small mb-4">Comienza gratis, sin tarjeta de crédito</p>
+
+            <!-- Mostrar errores del formulario -->
+            {% if form.errors %}
+                <div class="alert alert-danger rounded-2 py-2 px-3 small" role="alert">
+                    <i class="bi bi-exclamation-triangle me-1"></i>
+                    Por favor corrige los errores del formulario.
+                </div>
+            {% endif %}
+
+            <form method="POST" id="registroForm">
+                {% csrf_token %} <!-- Token de seguridad CSRF para proteger el formulario contra solicitudes falsificadas -->
+
+                <!-- ==========================================================
+                     DATOS PERSONALES
+                ========================================================== -->
+                <div class="row g-2">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold small">Nombres</label>
                             {{ form.nombres }}
+                            {{ form.nombres.errors }}
                         </div>
-                        <div class="col-md-6">
-                            <label class="form-label">Apellidos</label>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold small">Apellidos</label>
                             {{ form.apellidos }}
+                            {{ form.apellidos.errors }}
                         </div>
                     </div>
-                    <div class="mb-3">
-                        <label class="form-label">Cédula</label>
-                        {{ form.cedula }}
-                    </div>
-                    <div class="row mb-3">
-                        <div class="col-md-6">
-                            <label class="form-label">Usuario *</label>
-                            {{ form.username }}
-                            {{ form.username.errors }}
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label">Correo electrónico *</label>
-                            {{ form.email }}
-                            {{ form.email.errors }}
-                        </div>
-                    </div>
-                    <div class="row mb-3">
-                        <div class="col-md-6">
-                            <label class="form-label">Contraseña *</label>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label fw-semibold small">Cédula</label>
+                    {{ form.cedula }}
+                    {{ form.cedula.errors }}
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label fw-semibold small">Nombre de usuario *</label>
+                    {{ form.username }}
+                    {{ form.username.errors }}
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label fw-semibold small">Correo electrónico *</label>
+                    {{ form.email }}
+                    {{ form.email.errors }}
+                </div>
+
+                <div class="row g-2">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold small">Contraseña *</label>
                             {{ form.password }}
+                            {{ form.password.errors }}
                         </div>
-                        <div class="col-md-6">
-                            <label class="form-label">Confirmar contraseña *</label>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold small">Confirmar contraseña *</label>
                             {{ form.password2 }}
                             {{ form.password2.errors }}
                         </div>
                     </div>
-                    <div class="mb-4">
-                        <label class="form-label">Teléfono</label>
-                        {{ form.telefono }}
-                    </div>
+                </div>
 
-                    <div class="mb-4 form-check">
+                <div class="mb-4">
+                    <label class="form-label fw-semibold small">Teléfono</label>
+                    {{ form.telefono }}
+                    {{ form.telefono.errors }}
+                </div>
+
+                <!-- ==========================================================
+                     CHECKBOX: REGISTRARSE COMO EMPRESA
+                ========================================================== -->
+                <div class="mb-4 p-3 rounded-3" style="background-color: #f8f9fa; border: 1px solid #e9ecef;">
+                    <div class="form-check">
                         {{ form.es_empresa }}
-                        <label class="form-check-label fw-bold" for="{{ form.es_empresa.id_for_label }}">
-                            ¿Registrarse como empresa?
+                        <label class="form-check-label fw-bold" for="{{ form.es_empresa.id_for_label }}" style="color: var(--azul-principal);">
+                            Registrarse como empresa
                         </label>
-                        <div class="form-text">Si es una empresa, marque esta casilla para registrar los datos del negocio.</div>
                     </div>
+                    <div class="form-text small">Activa el panel de gestión de PQRS recibidas</div>
+                </div>
 
-                    <!-- Campos de empresa (ocultos inicialmente) -->
-                    <div id="empresaFields" style="display: none;">
-                        <hr>
-                        <h5 class="fw-bold text-primary mb-3">Datos de la empresa</h5>
-                        <div class="row mb-3">
-                            <div class="col-md-6">
-                                <label class="form-label">Nombre de la empresa *</label>
-                                {{ form.nombre_empresa }}
-                                {{ form.nombre_empresa.errors }}
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label">NIT *</label>
-                                {{ form.nit }}
-                                {{ form.nit.errors }}
-                            </div>
-                        </div>
+                <!-- ==========================================================
+                     CAMPOS DE EMPRESA (ocultos inicialmente)
+                ========================================================== -->
+                <div id="empresaFields" style="display: none;">
+                    <div class="p-3 rounded-3 mb-4" style="background-color: #f0f4fa; border: 1px solid #dce8f8;">
+                        <h6 class="fw-bold mb-3" style="color: var(--azul-principal);">
+                            <i class="bi bi-building me-2"></i>Datos de la empresa
+                        </h6>
+
                         <div class="mb-3">
-                            <label class="form-label">Dirección</label>
-                            {{ form.direccion }}
+                            <label class="form-label fw-semibold small">Nombre de la empresa *</label>
+                            {{ form.nombre_empresa }}
+                            {{ form.nombre_empresa.errors }}
                         </div>
-                        <div class="mb-4">
-                            <label class="form-label">Plan de suscripción *</label>
+
+                        <div class="row g-2">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label fw-semibold small">NIT *</label>
+                                    {{ form.nit }}
+                                    {{ form.nit.errors }}
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label fw-semibold small">Dirección</label>
+                                    {{ form.direccion }}
+                                    {{ form.direccion.errors }}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mb-2">
+                            <label class="form-label fw-semibold small">Plan de suscripción *</label>
                             {{ form.plan }}
                             {{ form.plan.errors }}
+                            <div class="form-text small">Selecciona el plan que mejor se adapte a tu negocio.</div>
                         </div>
                     </div>
+                </div>
 
-                    <div class="d-grid">
-                        <button type="submit" class="btn btn-success btn-lg fw-bold">Registrarse</button>
-                    </div>
-                </form>
-            </div>
+                <!-- ==========================================================
+                     BOTÓN DE REGISTRO
+                ========================================================== -->
+                <button type="submit" class="btn btn-primary w-100 py-3 fw-bold rounded-2 shadow-sm" style="background: linear-gradient(135deg, var(--azul-principal), var(--azul-medio)); border: none;">
+                    <i class="bi bi-check-circle me-2"></i> Registrarse
+                </button>
+            </form>
+
+            <!-- Enlace a login -->
+            <p class="text-center text-muted small mt-4">
+                ¿Ya tienes cuenta?
+                <a href="{% url 'usuarios:login' %}" class="fw-bold text-decoration-none" style="color: var(--azul-medio);">
+                    Inicia sesión
+                </a>
+            </p>
         </div>
-        <p class="text-center text-muted small mt-3">
-            ¿Ya tienes cuenta? <a href="{% url 'usuarios:login' %}">Inicia sesión aquí</a>
-        </p>
     </div>
 </div>
 
+<!-- ==========================================================
+     JAVASCRIPT PARA MOSTRAR/OCULTAR CAMPOS DE EMPRESA
+========================================================== -->
 <script>
     const esEmpresaCheck = document.getElementById('{{ form.es_empresa.id_for_label }}');
     const empresaFields = document.getElementById('empresaFields');
-    
+
     function toggleEmpresaFields() {
         if (esEmpresaCheck.checked) {
             empresaFields.style.display = 'block';
-            document.querySelector('input[name="nombre_empresa"]').required = true;
-            document.querySelector('input[name="nit"]').required = true;
-            document.querySelector('select[name="plan"]').required = true;
+            // Hacer obligatorios los campos de empresa
+            const nombreEmpresa = document.querySelector('input[name="nombre_empresa"]');
+            const nit = document.querySelector('input[name="nit"]');
+            const plan = document.querySelector('select[name="plan"]');
+            if (nombreEmpresa) nombreEmpresa.required = true;
+            if (nit) nit.required = true;
+            if (plan) plan.required = true;
         } else {
             empresaFields.style.display = 'none';
-            document.querySelector('input[name="nombre_empresa"]').required = false;
-            document.querySelector('input[name="nit"]').required = false;
-            document.querySelector('select[name="plan"]').required = false;
+            const nombreEmpresa = document.querySelector('input[name="nombre_empresa"]');
+            const nit = document.querySelector('input[name="nit"]');
+            const plan = document.querySelector('select[name="plan"]');
+            if (nombreEmpresa) nombreEmpresa.required = false;
+            if (nit) nit.required = false;
+            if (plan) plan.required = false;
         }
     }
-    
+
     if (esEmpresaCheck) {
         esEmpresaCheck.addEventListener('change', toggleEmpresaFields);
+        // Ejecutar al cargar para estado inicial
         toggleEmpresaFields();
     }
 </script>

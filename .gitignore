@@ -1,0 +1,10 @@
+.env
+db.sqlite3
+media/
+sent_emails/
+staticfiles/
+__pycache__/
+*.pyc
+venv/
+.DS_Store
+Thumbs.db

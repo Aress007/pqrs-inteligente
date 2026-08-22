@@ -1,225 +1,299 @@
-{% extends 'core/base.html' %} {% load static %} {% block title %}Dashboard
-Empresa{% endblock %} {% block breadcrumb %}
-<li class="breadcrumb-item active" aria-current="page">Panel de Control</li>
-{% endblock %} {% block extra_css %}
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-{% endblock %} {% block content %}
-<div class="container-fluid">
-  <div class="d-flex justify-content-between align-items-center mb-4">
-    <h1 class="h3">Panel de Control</h1>
-    <!-- Solo CLIENTES verían este botón, pero para EMPRESA lo ocultamos -->
-    {% if user.perfil.rol == 'cliente' %}
-    <a href="{% url 'pqrs:crear' %}" class="btn btn-primary">Nueva PQRS</a>
-    {% endif %}
-  </div>
+{% extends 'core/base.html' %}
+{% load static %}
 
-  <!-- Tarjetas resumen -->
-  <div class="row g-4 mb-5">
-    <div class="col-md-3">
-      <div class="card text-center">
-        <div class="card-body">
-          <h5 class="card-title">Total</h5>
-          <h2 class="display-6">{{ total }}</h2>
-        </div>
-      </div>
-    </div>
-    <div class="col-md-3">
-      <div class="card text-center bg-warning-subtle">
-        <div class="card-body">
-          <h5 class="card-title">Pendientes</h5>
-          <h2 class="display-6">{{ pendientes }}</h2>
-        </div>
-      </div>
-    </div>
-    <div class="col-md-3">
-      <div class="card text-center bg-info-subtle">
-        <div class="card-body">
-          <h5 class="card-title">En Proceso</h5>
-          <h2 class="display-6">{{ en_proceso }}</h2>
-        </div>
-      </div>
-    </div>
-    <div class="col-md-3">
-      <div class="card text-center bg-success-subtle">
-        <div class="card-body">
-          <h5 class="card-title">Resueltas</h5>
-          <h2 class="display-6">{{ resueltas }}</h2>
-        </div>
-      </div>
-    </div>
-  </div>
+{% block title %}Dashboard Empresa{% endblock %}
 
-  <!-- Gráfico y filtros -->
-  <div class="row mb-4">
-    <div class="col-md-6">
-      <div class="card">
-        <div class="card-header">Distribución por estado</div>
-        <div class="card-body">
-          <canvas id="estadoChart" width="400" height="200"></canvas>
+{% block breadcrumb %}
+    <li class="breadcrumb-item active" aria-current="page">Panel de Control</li>
+{% endblock %}
+
+{% block extra_css %}
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-0">
+
+    <!-- ============================================================
+         ENCABEZADO
+    ============================================================ -->
+    <div class="d-flex flex-wrap justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h3 fw-bold" style="color: var(--texto-oscuro);">Panel de Control</h1>
+            <p class="text-muted small mb-0">Gestiona todas las solicitudes recibidas por tu empresa</p>
         </div>
-      </div>
+        <!-- Solo CLIENTES verían este botón, pero para EMPRESA lo ocultamos -->
+        {% if user.perfil.rol == 'cliente' %}
+            <a href="{% url 'pqrs:crear' %}" class="btn btn-primary">
+                <i class="bi bi-plus-circle me-1"></i>Nueva PQRS
+            </a>
+        {% endif %}
     </div>
-    <div class="col-md-6">
-      <div class="card">
-        <div class="card-header">Filtros de búsqueda</div>
-        <div class="card-body">
-          <form method="GET" id="filtroForm">
-            <div class="row g-2">
-              <div class="col-md-6">
-                <input
-                  type="text"
-                  name="q"
-                  class="form-control"
-                  placeholder="Radicado o asunto"
-                  value="{{ request.GET.q }}"
-                />
-              </div>
-              <div class="col-md-4">
-                <select name="estado" class="form-select">
-                  <option value="">Todos los estados</option>
-                  <option
-                    value="Pendiente"
-                    {%
-                    if
-                    request.GET.estado=""
-                    ="Pendiente"
-                    %}selected{%
-                    endif
-                    %}
-                  >
-                    Pendiente
-                  </option>
-                  <option
-                    value="En Proceso"
-                    {%
-                    if
-                    request.GET.estado=""
-                    ="En Proceso"
-                    %}selected{%
-                    endif
-                    %}
-                  >
-                    En Proceso
-                  </option>
-                  <option
-                    value="Resuelta"
-                    {%
-                    if
-                    request.GET.estado=""
-                    ="Resuelta"
-                    %}selected{%
-                    endif
-                    %}
-                  >
-                    Resuelta
-                  </option>
-                </select>
-              </div>
-              <div class="col-md-2">
-                <button
-                  type="submit"
-                  class="btn btn-primary w-100 filtro-btn"
-                  title="Filtrar PQRS"
-                >
-                  <i class="bi bi-funnel-fill icono-filtrar"></i>
-                </button>
-              </div>
+
+    <!-- ============================================================
+         TARJETAS DE RESUMEN (KPI Cards)
+    ============================================================ -->
+    <div class="row g-4 mb-5">
+        <!-- Total -->
+        <div class="col-md-3 col-6">
+            <div class="card border-0 shadow-sm h-100 rounded-4">
+                <div class="card-body d-flex align-items-center gap-3">
+                    <div class="bg-primary bg-opacity-10 rounded-3 p-3">
+                        <i class="bi bi-envelope-paper fs-4 text-primary"></i>
+                    </div>
+                    <div>
+                        <h6 class="text-muted mb-1 small fw-semibold text-uppercase">Total</h6>
+                        <h2 class="display-6 fw-bold mb-0" style="color: var(--azul-principal);">{{ total }}</h2>
+                    </div>
+                </div>
             </div>
-            <div class="mt-2">
-              <a
-                href="?exportar=csv"
-                class="btn btn-sm btn-success"
-                title="Exportar PQRS a CSV"
-              >
-                Exportar a CSV
-              </a>
-              <a
-                href="{% url 'pqrs:dashboard' %}"
-                class="btn btn-sm btn-secondary"
-                title="Limpiar todos los filtros"
-              >
-                Limpiar filtros
-              </a>
-            </div>
-          </form>
         </div>
-      </div>
+        <!-- Pendientes -->
+        <div class="col-md-3 col-6">
+            <div class="card border-0 shadow-sm h-100 rounded-4">
+                <div class="card-body d-flex align-items-center gap-3">
+                    <div class="bg-warning bg-opacity-10 rounded-3 p-3">
+                        <i class="bi bi-clock-history fs-4 text-warning"></i>
+                    </div>
+                    <div>
+                        <h6 class="text-muted mb-1 small fw-semibold text-uppercase">Pendientes</h6>
+                        <h2 class="display-6 fw-bold mb-0" style="color: #d97706;">{{ pendientes }}</h2>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- En Proceso -->
+        <div class="col-md-3 col-6">
+            <div class="card border-0 shadow-sm h-100 rounded-4">
+                <div class="card-body d-flex align-items-center gap-3">
+                    <div class="bg-info bg-opacity-10 rounded-3 p-3">
+                        <i class="bi bi-arrow-repeat fs-4 text-info"></i>
+                    </div>
+                    <div>
+                        <h6 class="text-muted mb-1 small fw-semibold text-uppercase">En Proceso</h6>
+                        <h2 class="display-6 fw-bold mb-0" style="color: #2563eb;">{{ en_proceso }}</h2>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Resueltas -->
+        <div class="col-md-3 col-6">
+            <div class="card border-0 shadow-sm h-100 rounded-4">
+                <div class="card-body d-flex align-items-center gap-3">
+                    <div class="bg-success bg-opacity-10 rounded-3 p-3">
+                        <i class="bi bi-check2-circle fs-4 text-success"></i>
+                    </div>
+                    <div>
+                        <h6 class="text-muted mb-1 small fw-semibold text-uppercase">Resueltas</h6>
+                        <h2 class="display-6 fw-bold mb-0" style="color: #059669;">{{ resueltas }}</h2>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
-  </div>
 
-  <!-- Tabla de solicitudes -->
-  <div class="card">
-    <div class="card-header">Solicitudes recibidas</div>
-    <div class="card-body">
-      {% if pqrs_lista %}
-      <div class="table-responsive">
-        <table class="table table-striped table-hover">
-          <thead>
-            <tr>
-              <th>Radicado</th>
-              <th>Asunto</th>
-              <th>Tipo IA</th>
-              <th>Estado</th>
-              <th>Cliente</th>
-              <th>Fecha</th>
-              <th>Acciones</th>
-            </tr>
-          </thead>
-          <tbody>
-            {% for p in pqrs_lista %}
-            <tr>
-              <td><code>{{ p.codigo_radicado }}</code></td>
-              <td>{{ p.asunto|truncatechars:50 }}</td>
-              <td>{{ p.tipo_detectado|capfirst }}</td>
-              <td>
-                {% if p.estado == 'Pendiente' %}
-                <span class="badge bg-warning">Pendiente</span>
-                {% elif p.estado == 'En Proceso' %}
-                <span class="badge bg-info">En Proceso</span>
-                {% else %}
-                <span class="badge bg-success">Resuelta</span>
-                {% endif %}
-              </td>
-              <td>{{ p.id_usuario_creador.username }}</td>
-              <td>{{ p.fecha_creacion|date:"d/m/Y H:i" }}</td>
-              <td>
-                <a
-                  href="{% url 'pqrs:detalle' p.id %}"
-                  class="btn btn-sm btn-primary"
-                  title="Gestionar PQRS"
-                >
-                  Gestionar</a
-                >
-              </td>
-            </tr>
-            {% endfor %}
-          </tbody>
-        </table>
-      </div>
-      {% else %}
-      <p>No hay solicitudes que coincidan con los filtros.</p>
-      {% endif %}
+    <!-- ============================================================
+         GRÁFICO + FILTROS (2 columnas)
+    ============================================================ -->
+    <div class="row g-4 mb-5">
+        <!-- Gráfico -->
+        <div class="col-md-6">
+            <div class="card border-0 shadow-sm rounded-4 h-100">
+                <div class="card-header bg-white border-0 pt-4 pb-0">
+                    <h5 class="fw-semibold mb-0" style="color: var(--texto-oscuro);">
+                        <i class="bi bi-pie-chart me-2"></i>Distribución por estado
+                    </h5>
+                </div>
+                <div class="card-body d-flex justify-content-center align-items-center">
+                    <canvas id="estadoChart" width="400" height="300"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Filtros -->
+        <div class="col-md-6">
+            <div class="card border-0 shadow-sm rounded-4 h-100">
+                <div class="card-header bg-white border-0 pt-4 pb-0">
+                    <h5 class="fw-semibold mb-0" style="color: var(--texto-oscuro);">
+                        <i class="bi bi-funnel me-2"></i>Búsqueda y filtros
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <form method="GET" id="filtroForm">
+                        <!-- Búsqueda por texto -->
+                        <div class="mb-3">
+                            <div class="input-group">
+                                <span class="input-group-text bg-white border-end-0">
+                                    <i class="bi bi-search text-muted"></i>
+                                </span>
+                                <input
+                                    type="text"
+                                    name="q"
+                                    class="form-control border-start-0"
+                                    placeholder="Buscar por radicado o asunto..."
+                                    value="{{ request.GET.q }}"
+                                />
+                            </div>
+                        </div>
+
+                        <!-- Selector de estado y botón filtrar -->
+                        <div class="row g-2">
+                            <div class="col-8">
+                                <select name="estado" class="form-select">
+                                    <option value="">Todos los estados</option>
+                                    <option value="Pendiente" {% if request.GET.estado == 'Pendiente' %}selected{% endif %}>Pendiente</option>
+                                    <option value="En Proceso" {% if request.GET.estado == 'En Proceso' %}selected{% endif %}>En Proceso</option>
+                                    <option value="Resuelta" {% if request.GET.estado == 'Resuelta' %}selected{% endif %}>Resuelta</option>
+                                </select>
+                            </div>
+                            <div class="col-4">
+                                <button type="submit" class="btn btn-primary w-100">
+                                    <i class="bi bi-funnel-fill"></i> Filtrar
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Botones de acción -->
+                        <div class="mt-3 d-flex flex-wrap gap-2">
+                            <a href="?exportar=csv" class="btn btn-sm btn-success" title="Exportar PQRS a CSV">
+                                <i class="bi bi-download me-1"></i>Exportar a CSV
+                            </a>
+                            <a href="{% url 'pqrs:dashboard' %}" class="btn btn-sm btn-secondary" title="Limpiar todos los filtros">
+                                <i class="bi bi-arrow-counterclockwise me-1"></i>Limpiar filtros
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
     </div>
-  </div>
+
+    <!-- ============================================================
+         TABLA DE SOLICITUDES
+    ============================================================ -->
+    <div class="card border-0 shadow-sm rounded-4">
+        <div class="card-header bg-white border-0 pt-4 pb-0">
+            <h5 class="fw-semibold mb-0" style="color: var(--texto-oscuro);">
+                <i class="bi bi-table me-2"></i>Solicitudes recibidas
+            </h5>
+        </div>
+        <div class="card-body">
+            {% if pqrs_lista %}
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th class="fw-semibold">Radicado</th>
+                                <th class="fw-semibold">Asunto</th>
+                                <th class="fw-semibold">Tipo IA</th>
+                                <th class="fw-semibold">Estado</th>
+                                <th class="fw-semibold">Sentimiento</th>
+                                <th class="fw-semibold">Cliente</th>
+                                <th class="fw-semibold">Fecha</th>
+                                <th class="fw-semibold text-center">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for p in pqrs_lista %}
+                            <tr>
+                                <td>
+                                    <code class="small" style="color: var(--azul-medio);">{{ p.codigo_radicado }}</code>
+                                </td>
+                                <td class="text-truncate" style="max-width: 150px;" title="{{ p.asunto }}">
+                                    {{ p.asunto|truncatechars:40 }}
+                                </td>
+                                <td>
+                                    <span class="badge bg-secondary bg-opacity-10 text-secondary fw-semibold px-3 py-1 rounded-pill">
+                                        {{ p.tipo_detectado|capfirst }}
+                                    </span>
+                                </td>
+                                <td>
+                                    {% if p.estado == 'Pendiente' %}
+                                        <span class="badge bg-warning bg-opacity-10 text-warning fw-semibold px-3 py-1 rounded-pill">
+                                            <i class="bi bi-clock me-1"></i>Pendiente
+                                        </span>
+                                    {% elif p.estado == 'En Proceso' %}
+                                        <span class="badge bg-info bg-opacity-10 text-info fw-semibold px-3 py-1 rounded-pill">
+                                            <i class="bi bi-arrow-repeat me-1"></i>En Proceso
+                                        </span>
+                                    {% else %}
+                                        <span class="badge bg-success bg-opacity-10 text-success fw-semibold px-3 py-1 rounded-pill">
+                                            <i class="bi bi-check-circle me-1"></i>Resuelta
+                                        </span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if p.sentimiento == 'positivo' %}
+                                        <span class="badge bg-success bg-opacity-10 text-success px-3 py-1 rounded-pill" title="Sentimiento positivo">
+                                            <i class="bi bi-emoji-smile"></i> Positivo
+                                        </span>
+                                    {% elif p.sentimiento == 'negativo' %}
+                                        <span class="badge bg-danger bg-opacity-10 text-danger px-3 py-1 rounded-pill" title="Sentimiento negativo">
+                                            <i class="bi bi-emoji-frown"></i> Negativo
+                                        </span>
+                                    {% else %}
+                                        <span class="badge bg-secondary bg-opacity-10 text-secondary px-3 py-1 rounded-pill" title="Sentimiento neutral">
+                                            <i class="bi bi-emoji-neutral"></i> Neutral
+                                        </span>
+                                    {% endif %}
+                                </td>
+                                <td class="small">{{ p.id_usuario_creador.username }}</td>
+                                <td class="text-muted small">{{ p.fecha_creacion|date:"d/m/Y H:i" }}</td>
+                                <td class="text-center">
+                                    <a href="{% url 'pqrs:detalle' p.id %}" class="btn btn-sm btn-primary rounded-pill px-3" title="Gestionar esta PQRS">
+                                        <i class="bi bi-eye me-1"></i>Gestionar
+                                    </a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div class="text-center py-5">
+                    <i class="bi bi-inbox fs-1 text-muted"></i>
+                    <p class="text-muted mt-2">No hay solicitudes que coincidan con los filtros.</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
 </div>
 
+<!-- ============================================================
+     SCRIPT DEL GRÁFICO
+============================================================ -->
 <script>
-  const ctx = document.getElementById('estadoChart').getContext('2d');
-  new Chart(ctx, {
-      type: 'pie',
-      data: {
-          labels: ['Pendientes', 'En Proceso', 'Resueltas'],
-          datasets: [{
-              data: [{{ pendientes }}, {{ en_proceso }}, {{ resueltas }}],
-              backgroundColor: ['#ffc107', '#0dcaf0', '#198754'],
-          }]
-      },
-      options: {
-          responsive: true,
-          plugins: {
-              legend: { position: 'top' },
-          }
-      }
-  });
+    const ctx = document.getElementById('estadoChart').getContext('2d');
+    new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+            labels: ['Pendientes', 'En Proceso', 'Resueltas'],
+            datasets: [{
+                data: [{{ pendientes }}, {{ en_proceso }}, {{ resueltas }}],
+                backgroundColor: ['#f59e0b', '#3b82f6', '#10b981'],
+                borderWidth: 3,
+                borderColor: '#fff',
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                    labels: {
+                        padding: 20,
+                        usePointStyle: true,
+                        pointStyle: 'circle',
+                        font: {
+                            size: 13,
+                            weight: '500'
+                        }
+                    }
+                }
+            },
+            cutout: '65%'
+        }
+    });
 </script>
 {% endblock %}

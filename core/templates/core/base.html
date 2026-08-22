@@ -20,94 +20,325 @@
     />
 
     <style>
+      /* ==========================================================
+         PALETA DE COLORES (basada en el mockup de Figma)
+      ========================================================== */
       :root {
+        --azul-oscuro: #0d1f3c;
         --azul-principal: #1a3a6b;
         --azul-medio: #2756a8;
         --azul-claro: #dce8f8;
-        --acento: #2756a8;
+        --azul-hover: #60a5fa;
         --texto-oscuro: #1a2340;
         --gris-suave: #f4f6fb;
+        --blanco: #ffffff;
+        --sombra: 0 4px 20px rgba(0, 0, 0, 0.1);
       }
 
+      /* ==========================================================
+         ESTILOS GENERALES
+      ========================================================== */
       body {
         background-color: var(--gris-suave);
         color: var(--texto-oscuro);
-        font-family: "Segoe UI", sans-serif;
+        font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
         display: flex;
         flex-direction: column;
         min-height: 100vh;
       }
 
+      /* ==========================================================
+         NAVBAR (estilo mockup)
+      ========================================================== */
       .navbar-pqrs {
-        background-color: var(--azul-principal);
+        background: linear-gradient(135deg, var(--azul-oscuro) 0%, var(--azul-principal) 50%, var(--azul-medio) 100%) !important;
+        box-shadow: var(--sombra);
+        padding: 12px 0;
       }
+
       .navbar-pqrs .navbar-brand {
-        color: #fff;
+        color: var(--blanco);
         font-weight: 700;
         font-size: 1.3rem;
+        display: flex;
+        align-items: center;
+        gap: 10px;
       }
+
+      .navbar-pqrs .navbar-brand i {
+        font-size: 1.5rem;
+        background: rgba(255, 255, 255, 0.15);
+        padding: 6px;
+        border-radius: 10px;
+      }
+
       .navbar-pqrs .nav-link {
         color: rgba(255, 255, 255, 0.85) !important;
         font-weight: 500;
+        font-size: 0.95rem;
+        transition: color 0.2s ease;
       }
+
       .navbar-pqrs .nav-link:hover {
-        color: #fff !important;
+        color: var(--blanco) !important;
       }
+
+      /* ==========================================================
+         LOGO DE EMPRESA EN NAVBAR
+      ========================================================== */
+      .navbar-empresa-logo {
+        width: 28px;
+        height: 28px;
+        object-fit: contain;
+        border-radius: 4px;
+        background-color: #fff;
+        padding: 2px;
+      }
+
+      /* ==========================================================
+         BOTONES DEL NAVBAR (estilo mockup)
+      ========================================================== */
+      .navbar-pqrs .btn-outline-light {
+        border-color: rgba(255, 255, 255, 0.25);
+        color: rgba(255, 255, 255, 0.85);
+        transition: all 0.2s;
+        border-radius: 8px;
+      }
+
+      .navbar-pqrs .btn-outline-light:hover {
+        background: rgba(255, 255, 255, 0.15);
+        border-color: rgba(255, 255, 255, 0.5);
+        color: var(--blanco);
+      }
+
       .btn-registro {
         background-color: var(--azul-medio);
         color: #fff;
         border: none;
-        border-radius: 6px;
+        border-radius: 8px;
         font-weight: 600;
-        padding: 6px 18px;
+        padding: 8px 20px;
+        transition: background 0.2s;
       }
+
       .btn-registro:hover {
         background-color: #1e4a9a;
         color: #fff;
       }
+
+      /* ==========================================================
+         BREADCRUMB
+      ========================================================== */
       .breadcrumb-bar {
-        background-color: #fff;
+        background-color: var(--blanco);
         border-bottom: 1px solid #e0e7ef;
-        padding: 8px 0;
+        padding: 10px 0;
       }
+
       .breadcrumb-item + .breadcrumb-item::before {
         content: "›";
         color: var(--azul-medio);
+        font-weight: bold;
       }
+
       .breadcrumb-item a {
         color: var(--azul-medio);
         text-decoration: none;
       }
+
+      .breadcrumb-item.active {
+        color: #6c757d;
+      }
+
+      /* ==========================================================
+         CONTENIDO PRINCIPAL
+      ========================================================== */
       main {
         flex: 1;
       }
+
+      /* ==========================================================
+         FOOTER (estilo mockup)
+      ========================================================== */
       footer {
-        background-color: var(--azul-principal);
-        color: rgba(255, 255, 255, 0.85);
+        background: linear-gradient(135deg, var(--azul-oscuro) 0%, var(--azul-principal) 100%);
+        color: rgba(255, 255, 255, 0.8);
         font-size: 0.875rem;
-        padding: 16px 0;
+        padding: 20px 0;
         margin-top: auto;
       }
+
       footer a {
-        color: rgba(255, 255, 255, 0.7);
+        color: rgba(255, 255, 255, 0.6);
         text-decoration: none;
+        transition: color 0.2s;
       }
+
+      footer a:hover {
+        color: var(--blanco);
+      }
+
+      footer .border-light {
+        border-color: rgba(255, 255, 255, 0.1) !important;
+      }
+
+      /* ==========================================================
+         ALERTAS
+      ========================================================== */
       .alert-exito {
         border-left: 4px solid #28a745;
         background-color: #d4edda;
       }
+
       .alert-error {
         border-left: 4px solid #dc3545;
         background-color: #f8d7da;
       }
+
       .alert-info {
         border-left: 4px solid #17a2b8;
         background-color: #d1ecf1;
+      }
+
+      /* ==========================================================
+         BOTONES FLOTANTES (WhatsApp y Chatbot)
+      ========================================================== */
+      .whatsapp-float {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        z-index: 9999;
+        background-color: #25d366;
+        color: #fff;
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        text-align: center;
+        font-size: 35px;
+        box-shadow: 0 4px 15px rgba(37, 211, 102, 0.4);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.3s ease;
+        text-decoration: none;
+      }
+
+      .whatsapp-float:hover {
+        transform: scale(1.1);
+        background-color: #20b85a;
+        color: #fff;
+      }
+
+      @media (max-width: 768px) {
+        .whatsapp-float {
+          width: 55px;
+          height: 55px;
+          font-size: 30px;
+          bottom: 15px;
+          right: 15px;
+        }
+      }
+
+      .chatbot-float {
+        position: fixed;
+        bottom: 90px;
+        right: 20px;
+        z-index: 9999;
+        background-color: var(--azul-medio);
+        color: #fff;
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        text-align: center;
+        font-size: 35px;
+        box-shadow: 0 4px 15px rgba(39, 86, 168, 0.4);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        border: none;
+        cursor: pointer;
+        padding: 0;
+      }
+
+      .chatbot-float:hover {
+        transform: scale(1.1);
+        background-color: #1e4a9a;
+        color: #fff;
+      }
+
+      @media (max-width: 768px) {
+        .chatbot-float {
+          width: 55px;
+          height: 55px;
+          font-size: 30px;
+          bottom: 80px;
+          right: 15px;
+        }
+      }
+
+      /* ==========================================================
+         PANEL FLOTANTE DEL CHATBOT
+      ========================================================== */
+      #chatbot-panel {
+        display: none;
+        position: fixed;
+        bottom: 150px;
+        right: 20px;
+        width: 380px;
+        max-width: 90vw;
+        height: 500px;
+        max-height: 70vh;
+        background: #fff;
+        border-radius: 12px;
+        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+        z-index: 10000;
+        overflow: hidden;
+        border: 1px solid #ddd;
+        flex-direction: column;
+      }
+
+      #chatbot-panel .chatbot-header {
+        background: var(--azul-principal);
+        color: #fff;
+        padding: 10px 15px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-weight: bold;
+        border-radius: 12px 12px 0 0;
+      }
+
+      #chatbot-panel .chatbot-close {
+        background: none;
+        border: none;
+        color: #fff;
+        font-size: 24px;
+        cursor: pointer;
+        padding: 0;
+        line-height: 1;
+      }
+
+      #chatbot-panel .chatbot-iframe {
+        width: 100%;
+        height: calc(100% - 50px);
+        border: none;
+      }
+
+      @media (max-width: 768px) {
+        #chatbot-panel {
+          width: 95vw;
+          height: 60vh;
+          bottom: 140px;
+          right: 10px;
+        }
       }
     </style>
 
     {% block extra_css %}{% endblock %}
   </head>
+
   <body>
     <!-- ===== NAVBAR ===== -->
     <nav class="navbar navbar-expand-lg navbar-pqrs">
@@ -115,6 +346,7 @@
         <a class="navbar-brand" href="{% url 'core:inicio' %}">
           <i class="bi bi-shield-check me-2"></i>PQRS Inteligente
         </a>
+
         <button
           class="navbar-toggler border-light"
           type="button"
@@ -126,51 +358,131 @@
         >
           <span class="navbar-toggler-icon"></span>
         </button>
+
         <div class="collapse navbar-collapse" id="navPrincipal">
-          <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-            <li class="nav-item">
-              <a class="nav-link" href="#"
-                ><i class="bi bi-grid me-1"></i>Funciones</a
-              >
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="#"
-                ><i class="bi bi-tags me-1"></i>Planes</a
-              >
-            </li>
-          </ul>
-          <div class="d-flex gap-2 align-items-center">
+          <div class="ms-auto d-flex gap-2 align-items-center flex-wrap">
             {% if user.is_authenticated %}
-            <span class="text-white me-2" title="Usuario autenticado">
-              <i class="bi bi-person-circle"></i> {{ user.username }}
+
+            <!-- Usuario -->
+            <span
+              class="text-white me-2 d-flex align-items-center"
+              title="Usuario autenticado"
+            >
+              {% if user.perfil.foto %}
+              <img
+                src="{{ user.perfil.foto.url }}"
+                alt="Foto de perfil"
+                class="rounded-circle me-1"
+                style="width: 30px; height: 30px; object-fit: cover"
+              />
+              {% else %}
+              <i class="bi bi-person-circle me-1"></i>
+              {% endif %} {{ user.username }}
             </span>
-            <a href="{% url 'core:ayuda' %}" class="btn btn-outline-light btn-sm me-1" title="Manual de usuario">
+
+            <!-- Empresa: logo y nombre -->
+            {% if user.perfil.rol == 'empresa' and user.perfil.empresa %}
+            <span
+              class="text-white-50 me-2 small d-flex align-items-center"
+              title="Empresa"
+            >
+              {% if user.perfil.logo %}
+              <img
+                src="{{ user.perfil.logo.url }}"
+                alt="Logo de {{ user.perfil.empresa.nombre_empresa }}"
+                class="navbar-empresa-logo me-1"
+              />
+              {% endif %}
+              <span class="d-none d-sm-inline">
+                {{ user.perfil.empresa.nombre_empresa }}
+              </span>
+            </span>
+            {% endif %}
+
+            <!-- Ayuda -->
+            <a
+              href="{% url 'core:ayuda' %}"
+              class="btn btn-outline-light btn-sm me-1"
+              title="Manual de usuario"
+            >
               <i class="bi bi-question-circle"></i> Ayuda
             </a>
+
             {% if user.perfil.rol == 'empresa' %}
-              <a href="{% url 'core:respaldar_bd' %}" class="btn btn-outline-light btn-sm me-1" title="Descargar respaldo de la base de datos">
-                <i class="bi bi-download"></i> Respaldo BD
-              </a>
-              <a href="{% url 'core:restaurar_bd' %}" class="btn btn-outline-light btn-sm me-1" title="Restaurar base de datos desde archivo">
-                <i class="bi bi-upload"></i> Restaurar BD
-              </a>
+
+            <!-- Dashboard -->
+            <a
+              href="{% url 'pqrs:dashboard' %}"
+              class="btn btn-outline-light btn-sm me-1"
+              title="Dashboard de la empresa"
+            >
+              <i class="bi bi-speedometer2"></i> Dashboard
+            </a>
+
+            <!-- Funciones -->
+            <a
+              href="{% url 'core:funciones' %}"
+              class="btn btn-outline-light btn-sm me-1"
+              title="Funciones del sistema"
+            >
+              <i class="bi bi-grid"></i> Funciones
+            </a>
+
+            {% endif %} {% if user.perfil.rol != 'empresa' %}
+            <a
+              href="{% url 'pqrs:mis_solicitudes' %}"
+              class="btn btn-outline-light btn-sm me-1"
+              title="Ver mis solicitudes"
+            >
+              <i class="bi bi-file-earmark-text"></i> Mis solicitudes
+            </a>
             {% endif %}
-            <a href="{% url 'usuarios:editar_perfil' %}" class="btn btn-outline-light btn-sm me-1" title="Editar perfil de usuario">
+
+            <!-- Mi perfil -->
+            <a
+              href="{% url 'usuarios:editar_perfil' %}"
+              class="btn btn-outline-light btn-sm me-1"
+              title="Editar perfil de usuario"
+            >
               <i class="bi bi-pencil-square"></i> Mi perfil
             </a>
-            <form method="POST" action="{% url 'usuarios:logout' %}" style="display: inline">
+
+            <!-- Cerrar sesión -->
+            <form
+              method="POST"
+              action="{% url 'usuarios:logout' %}"
+              style="display: inline"
+            >
               {% csrf_token %}
-              <button type="submit" class="btn btn-outline-light btn-sm" title="Cerrar sesión">
+              <button
+                type="submit"
+                class="btn btn-outline-light btn-sm"
+                title="Cerrar sesión"
+              >
                 <i class="bi bi-box-arrow-right"></i> Cerrar sesión
               </button>
             </form>
+
             {% else %}
-            <a href="{% url 'usuarios:login' %}" class="nav-link text-white" title="Iniciar sesión en el sistema">
+
+            <!-- Iniciar sesión -->
+            <a
+              href="{% url 'usuarios:login' %}"
+              class="nav-link text-white"
+              title="Iniciar sesión en el sistema"
+            >
               <i class="bi bi-person me-1"></i>Iniciar Sesión
             </a>
-            <a href="{% url 'usuarios:registro_unificado' %}" class="btn btn-registro" title="Crear nueva cuenta">
+
+            <!-- Registro -->
+            <a
+              href="{% url 'usuarios:registro_unificado' %}"
+              class="btn btn-registro"
+              title="Crear nueva cuenta"
+            >
               <i class="bi bi-person-plus me-1"></i>Regístrate
             </a>
+
             {% endif %}
           </div>
         </div>
@@ -220,7 +532,6 @@
     <footer>
       <div class="container">
         <div class="row text-start text-md-center">
-          <!-- Columna 1: Información institucional -->
           <div class="col-md-4 mb-3">
             <h6 class="fw-bold text-white">PQRS Inteligente</h6>
             <p class="mb-1 small">
@@ -234,25 +545,47 @@
             </p>
           </div>
 
-          <!-- Columna 2: Enlaces útiles -->
           <div class="col-md-4 mb-3">
             <h6 class="fw-bold text-white">Enlaces rápidos</h6>
             <ul class="list-unstyled small">
-              <li><a href="#" class="text-white-50 text-decoration-none">Términos y condiciones</a></li>
-              <li><a href="#" class="text-white-50 text-decoration-none">Política de privacidad</a></li>
-              <li><a href="#" class="text-white-50 text-decoration-none">Ayuda / FAQ</a></li>
-              <li><a href="#" class="text-white-50 text-decoration-none">Contacto</a></li>
+              <li>
+                <a href="#" class="text-white-50 text-decoration-none"
+                  >Términos y condiciones</a
+                >
+              </li>
+              <li>
+                <a href="#" class="text-white-50 text-decoration-none"
+                  >Política de privacidad</a
+                >
+              </li>
+              <li>
+                <a href="{% url 'core:ayuda' %}" class="text-white-50 text-decoration-none"
+                  >Ayuda / FAQ</a
+                >
+              </li>
+              <li>
+                <a href="#" class="text-white-50 text-decoration-none"
+                  >Contacto</a
+                >
+              </li>
             </ul>
           </div>
 
-          <!-- Columna 3: Redes sociales y créditos -->
           <div class="col-md-4 mb-3">
             <h6 class="fw-bold text-white">Síguenos</h6>
             <div class="d-flex justify-content-center gap-3">
-              <a href="#" class="text-white-50" aria-label="Facebook"><i class="bi bi-facebook fs-5"></i></a>
-              <a href="#" class="text-white-50" aria-label="Twitter"><i class="bi bi-twitter fs-5"></i></a>
-              <a href="#" class="text-white-50" aria-label="Instagram"><i class="bi bi-instagram fs-5"></i></a>
-              <a href="#" class="text-white-50" aria-label="YouTube"><i class="bi bi-youtube fs-5"></i></a>
+              <a href="#" class="text-white-50" aria-label="Facebook">
+                <i class="bi bi-facebook fs-5"></i>
+              </a>
+              <a href="#" class="text-white-50" aria-label="Twitter">
+                <i class="bi bi-twitter fs-5"></i>
+              </a>
+              <a href="#" class="text-white-50" aria-label="Instagram">
+                <i class="bi bi-instagram fs-5"></i>
+              </a>
+              <a href="#" class="text-white-50" aria-label="YouTube">
+                <i class="bi bi-youtube fs-5"></i>
+              </a>
             </div>
             <p class="mt-2 small">
               <i class="bi bi-shield-lock me-1"></i>
@@ -261,8 +594,8 @@
           </div>
         </div>
 
-        <!-- Línea inferior -->
         <hr class="border-light opacity-25" />
+
         <div class="text-center small">
           Cumplimos con la
           <a
@@ -278,15 +611,121 @@
       </div>
     </footer>
 
+    <!-- ===== SCRIPTS ===== -->
     <script
       src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
       integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
       crossorigin="anonymous"
     ></script>
+
     <script
       src="https://cdn.jsdelivr.net/npm/sienna-accessibility/dist/sienna-accessibility.umd.js"
       async
     ></script>
+
     {% block extra_js %}{% endblock %}
+
+    <!-- ===== BOTÓN FLOTANTE DE WHATSAPP ===== -->
+    <a
+      href="https://wa.me/573223802239?text=Hola,%20me%20comunico%20desde%20PQRS%20Inteligente"
+      class="whatsapp-float"
+      target="_blank"
+      rel="noopener noreferrer"
+      aria-label="Contactar por WhatsApp"
+    >
+      <i class="bi bi-whatsapp"></i>
+    </a>
+
+    <!-- ===== BOTÓN FLOTANTE DEL CHATBOT ===== -->
+    <button
+      id="chatbot-toggle"
+      class="chatbot-float"
+      aria-label="Abrir chatbot"
+    >
+      <i class="bi bi-robot"></i>
+    </button>
+
+    <!-- ===== PANEL FLOTANTE DEL CHATBOT ===== -->
+    <div id="chatbot-panel">
+      <div class="chatbot-header">
+        <span><i class="bi bi-robot me-2"></i>Asistente Virtual</span>
+        <button
+          id="chatbot-close"
+          class="chatbot-close"
+          aria-label="Cerrar chatbot"
+        >
+          &times;
+        </button>
+      </div>
+      <iframe
+        src="{% url 'pqrs:chatbot' %}?embed=1"
+        class="chatbot-iframe"
+        title="Asistente Virtual"
+        loading="lazy"
+      ></iframe>
+    </div>
+
+    <!-- ===== CHATBOT JAVASCRIPT ===== -->
+    <script>
+      (function () {
+        console.log("Inicializando chatbot flotante...");
+
+        var toggleBtn = document.getElementById("chatbot-toggle");
+        var panel = document.getElementById("chatbot-panel");
+        var closeBtn = document.getElementById("chatbot-close");
+
+        console.log("toggleBtn:", toggleBtn);
+        console.log("panel:", panel);
+        console.log("closeBtn:", closeBtn);
+
+        if (!toggleBtn) {
+          console.error("Botón del chatbot no encontrado (#chatbot-toggle)");
+          return;
+        }
+        if (!panel) {
+          console.error("Panel del chatbot no encontrado (#chatbot-panel)");
+          return;
+        }
+        if (!closeBtn) {
+          console.error("Botón de cerrar no encontrado (#chatbot-close)");
+          return;
+        }
+
+        // Abrir panel
+        toggleBtn.addEventListener("click", function (e) {
+          e.preventDefault();
+          e.stopPropagation();
+          console.log("Click en botón chatbot. Estado actual:", panel.style.display);
+          if (panel.style.display === "none" || panel.style.display === "") {
+            panel.style.display = "flex";
+            console.log("Panel abierto");
+          } else {
+            panel.style.display = "none";
+            console.log("Panel cerrado");
+          }
+        });
+
+        // Cerrar panel (X)
+        closeBtn.addEventListener("click", function (e) {
+          e.stopPropagation();
+          console.log("Cerrar chatbot clickeado");
+          panel.style.display = "none";
+        });
+
+        // Cerrar al hacer clic fuera del panel
+        document.addEventListener("click", function (e) {
+          if (
+            panel.style.display === "flex" &&
+            !panel.contains(e.target) &&
+            e.target !== toggleBtn
+          ) {
+            console.log("Cerrando panel por clic fuera");
+            panel.style.display = "none";
+          }
+        });
+
+        console.log("Chatbot inicializado correctamente.");
+      })();
+    </script>
   </body>
 </html>

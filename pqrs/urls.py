@@ -11,4 +11,5 @@ urlpatterns = [
     path("<int:pqrs_id>/", views.detalle_pqrs, name="detalle"),
     path("respuesta/editar/<int:respuesta_id>/", views.editar_respuesta, name="editar_respuesta",),
     path("respuesta/eliminar/<int:respuesta_id>/", views.eliminar_respuesta, name="eliminar_respuesta",),
+    path('chatbot/', views.chatbot_view, name='chatbot'),
 ]

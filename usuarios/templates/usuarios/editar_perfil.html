@@ -7,43 +7,122 @@
 {% endblock %}
 
 {% block content %}
-<div class="row justify-content-center">
-    <div class="col-md-6">
-        <div class="card shadow border-0 rounded-4">
-            <div class="card-header bg-primary text-white rounded-top-4 py-3">
-                <h2 class="h4 mb-0 fw-bold">
-                    <i class="bi bi-person-circle me-2"></i> Editar Perfil
-                </h2>
-                <small>Actualiza tus datos personales</small>
-            </div>
-            <div class="card-body p-4">
-                <form method="POST">
-                    {% csrf_token %}
-                    <h5 class="fw-bold text-primary mb-3">Datos de la cuenta</h5>
-                    <div class="mb-3">
-                        <label class="form-label">Nombre de usuario</label>
-                        {{ user_form.username }}
-                        {{ user_form.username.errors }}
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Correo electrónico</label>
-                        {{ user_form.email }}
-                        {{ user_form.email.errors }}
-                    </div>
-                    <div class="mb-4">
-                        <label class="form-label">Teléfono</label>
-                        {{ telefono_form.telefono }}
-                        {{ telefono_form.telefono.errors }}
-                    </div>
-                    <div class="d-grid gap-2">
-                        <button type="submit" class="btn btn-success btn-lg fw-bold">
-                            <i class="bi bi-save me-2"></i> Guardar cambios
-                        </button>
-                        <a href="{% url 'usuarios:cambiar_password' %}" class="btn btn-outline-primary">
-                            <i class="bi bi-key me-2"></i> Cambiar contraseña
-                        </a>
-                    </div>
-                </form>
+<div class="container">
+    <!-- Botón Volver -->
+    <div class="mb-3">
+        <a href="{% if user.perfil.rol == 'empresa' %}{% url 'pqrs:dashboard' %}{% else %}{% url 'pqrs:mis_solicitudes' %}{% endif %}" class="btn btn-outline-secondary rounded-pill px-4">
+            <i class="bi bi-arrow-left me-1"></i> Volver
+        </a>
+    </div>
+
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card border-0 shadow-lg rounded-4">
+                <!-- Encabezado -->
+                <div class="card-header bg-primary text-white rounded-top-4 py-3" style="background: linear-gradient(135deg, #1a3a6b, #2756a8);">
+                    <h2 class="h4 mb-0 fw-bold">
+                        <i class="bi bi-person-circle me-2"></i> Editar Perfil
+                    </h2>
+                    <small class="opacity-75">Actualiza tus datos personales</small>
+                </div>
+
+                <div class="card-body p-4">
+                    <form method="POST" enctype="multipart/form-data">
+                        {% csrf_token %}
+
+                        <!-- Datos de la cuenta -->
+                        <h5 class="fw-bold" style="color: var(--azul-principal);">
+                            <i class="bi bi-shield-lock me-2"></i>Datos de la cuenta
+                        </h5>
+                        <div class="row g-3 mb-4">
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">Nombre de usuario</label>
+                                {{ user_form.username }}
+                                {{ user_form.username.errors }}
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">Correo electrónico</label>
+                                {{ user_form.email }}
+                                {{ user_form.email.errors }}
+                            </div>
+                        </div>
+
+                        <!-- Información personal -->
+                        <h5 class="fw-bold mt-4" style="color: var(--azul-principal);">
+                            <i class="bi bi-person-badge me-2"></i>Información personal
+                        </h5>
+                        <div class="row g-3 mb-4">
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">Nombres</label>
+                                {{ user_form.nombres }}
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">Apellidos</label>
+                                {{ user_form.apellidos }}
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">Cédula</label>
+                                {{ user_form.cedula }}
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">Teléfono</label>
+                                {{ user_form.telefono }}
+                            </div>
+                        </div>
+
+                        <!-- Imagen de perfil -->
+                        <h5 class="fw-bold mt-4" style="color: var(--azul-principal);">
+                            <i class="bi bi-image me-2"></i>Imagen de perfil
+                        </h5>
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Foto de perfil</label>
+                            {% if user.perfil.foto %}
+                                <div class="mb-2">
+                                    <img src="{{ user.perfil.foto.url }}" class="img-thumbnail rounded-3" style="max-width: 150px; max-height: 150px; object-fit: cover;">
+                                </div>
+                                <div class="form-check mb-2">
+                                    <input class="form-check-input" type="checkbox" name="eliminar_foto" id="eliminar_foto">
+                                    <label class="form-check-label text-danger" for="eliminar_foto">
+                                        <i class="bi bi-trash me-1"></i> Eliminar foto actual
+                                    </label>
+                                </div>
+                            {% endif %}
+                            {{ user_form.foto }}
+                        </div>
+
+                        <!-- Logo de empresa (solo para empresas) -->
+                        {% if user.perfil.rol == 'empresa' %}
+                            <h5 class="fw-bold mt-4" style="color: var(--azul-principal);">
+                                <i class="bi bi-building me-2"></i>Logo de la empresa
+                            </h5>
+                            <div class="mb-3">
+                                <label class="form-label fw-semibold">Logo</label>
+                                {% if user.perfil.logo %}
+                                    <div class="mb-2">
+                                        <img src="{{ user.perfil.logo.url }}" class="img-thumbnail rounded-3" style="max-width: 150px; max-height: 150px; object-fit: contain;">
+                                    </div>
+                                    <div class="form-check mb-2">
+                                        <input class="form-check-input" type="checkbox" name="eliminar_logo" id="eliminar_logo">
+                                        <label class="form-check-label text-danger" for="eliminar_logo">
+                                            <i class="bi bi-trash me-1"></i> Eliminar logo actual
+                                        </label>
+                                    </div>
+                                {% endif %}
+                                {{ user_form.logo }}
+                            </div>
+                        {% endif %}
+
+                        <!-- Botones -->
+                        <div class="d-grid gap-2 mt-4">
+                            <button type="submit" class="btn btn-success btn-lg fw-bold rounded-pill py-3">
+                                <i class="bi bi-save me-2"></i> Guardar cambios
+                            </button>
+                            <a href="{% url 'usuarios:cambiar_password' %}" class="btn btn-outline-primary rounded-pill py-2">
+                                <i class="bi bi-key me-2"></i> Cambiar contraseña
+                            </a>
+                        </div>
+                    </form>
+                </div>
             </div>
         </div>
     </div>

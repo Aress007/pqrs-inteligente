@@ -9,7 +9,7 @@
             <div class="card-body p-4 p-md-5">
                 <h2 class="h5 text-center fw-bold mb-4">Establecer nueva contraseña</h2>
                 <form method="POST">
-                    {% csrf_token %}
+                    {% csrf_token %} <!-- Token de seguridad CSRF para proteger el formulario contra solicitudes falsificadas -->
                     <div class="mb-3">
                         <label class="form-label">Nueva contraseña</label>
                         <input type="password" name="new_password" class="form-control" required>

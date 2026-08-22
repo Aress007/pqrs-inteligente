@@ -1,108 +1,174 @@
-{% extends 'core/base.html' %} {% block title %}Iniciar Sesión - PQRS
-Inteligente{% endblock %} {% block breadcrumb %}
-<li class="breadcrumb-item active" aria-current="page">Iniciar Sesión</li>
-{% endblock %} {% block content %}
-<div class="row justify-content-center my-4">
-  <div class="col-md-5 col-lg-4">
-    <div class="text-center mb-4">
-      <i class="bi bi-shield-check text-primary" style="font-size: 3rem"></i>
-      <h1 class="h4 fw-bold mt-2 text-dark">PQRS Inteligente</h1>
-      <p class="text-muted small">Iniciar Sesión — Acceso al sistema</p>
-    </div>
-    <div class="card shadow border-0 rounded-4">
-      <div class="card-body p-4 p-md-5">
-        <h2 class="h5 text-center fw-bold mb-4">
-          <i class="bi bi-person-circle me-2"></i>Iniciar Sesión
-        </h2>
-        <form method="POST" action="{% url 'usuarios:login' %}">
-          {% csrf_token %}
-          <div class="mb-3">
-            <label class="form-label fw-semibold">Nombre de Usuario</label>
-            <input
-              type="text"
-              name="username"
-              class="form-control form-control-lg"
-              placeholder="Ingrese su usuario"
-              autocomplete="username"
-              required
-            />
-            <div class="form-text">
-              Su nombre de usuario registrado en el sistema.
+{% extends 'core/base.html' %}
+
+{% block title %}Iniciar Sesión - PQRS Inteligente{% endblock %}
+
+{% block content %}
+<div class="min-vh-100 d-flex align-items-stretch">
+
+    <!-- ==========================================================
+         COLUMNA IZQUIERDA - FONDO AZUL CON CARACTERÍSTICAS
+    ========================================================== -->
+    <div class="d-none d-lg-flex flex-column justify-content-between p-5" style="flex: 1; background: linear-gradient(160deg, #0d1f3c 0%, #1a3a6b 50%, #2756a8 100%); color: white;">
+        <!-- Logo -->
+        <div>
+            <div class="d-flex align-items-center gap-2 mb-5">
+                <div class="bg-white/20 rounded-2 p-2">
+                    <i class="bi bi-shield-check fs-4"></i>
+                </div>
+                <span class="fw-bold fs-5">PQRS Inteligente</span>
             </div>
-          </div>
-          <div class="mb-4">
-            <label class="form-label fw-semibold">Contraseña</label>
-            <div class="input-group">
-              <input
-                type="password"
-                name="password"
-                id="password"
-                class="form-control form-control-lg"
-                placeholder="Ingrese su contraseña"
-                autocomplete="current-password"
-                required
-              />
-              <button
-                class="btn btn-outline-secondary"
-                type="button"
-                id="togglePassword"
-                aria-label="Mostrar contraseña"
-              >
-                <i class="bi bi-eye" id="iconoOjo"></i>
-              </button>
+        </div>
+
+        <!-- Texto central -->
+        <div>
+            <h1 class="display-4 fw-bold mb-4">Bienvenido de<br>vuelta</h1>
+            <p class="fs-5 opacity-75 mb-5" style="max-width: 400px;">
+                Gestiona todas las solicitudes de tus clientes desde un solo lugar, con el poder de la Inteligencia Artificial.
+            </p>
+            <div class="d-flex flex-column gap-3">
+                <div class="d-flex align-items-center gap-2">
+                    <div class="bg-white/20 rounded-circle p-1">
+                        <i class="bi bi-check-lg"></i>
+                    </div>
+                    <span class="opacity-80">Clasificación automática por IA</span>
+                </div>
+                <div class="d-flex align-items-center gap-2">
+                    <div class="bg-white/20 rounded-circle p-1">
+                        <i class="bi bi-check-lg"></i>
+                    </div>
+                    <span class="opacity-80">Análisis de sentimiento en tiempo real</span>
+                </div>
+                <div class="d-flex align-items-center gap-2">
+                    <div class="bg-white/20 rounded-circle p-1">
+                        <i class="bi bi-check-lg"></i>
+                    </div>
+                    <span class="opacity-80">SLA y trazabilidad completa</span>
+                </div>
             </div>
-          </div>
-          <div class="d-grid mb-3">
-            <button
-              type="submit"
-              class="btn btn-primary btn-lg fw-bold rounded-3"
-            >
-              Ingresar
-            </button>
-          </div>
-          <div class="text-center mb-2">
-            <a
-              href="{% url 'password_reset' %}"
-              class="text-decoration-none text-muted small"
-            >
-              <i class="bi bi-question-circle me-1"></i>¿Olvidaste tu
-              contraseña?
-            </a>
-          </div>
-          <hr class="my-3" />
-          <div class="text-center">
-            <span class="text-muted small">¿No tienes cuenta?</span>
-            <a
-              href="{% url 'usuarios:registro_unificado' %}"
-              class="text-decoration-none fw-bold text-primary ms-1"
-              >Regístrate aquí</a
-            >
-          </div>
-        </form>
-      </div>
+        </div>
+
+        <!-- Footer izquierda -->
+        <div class="mt-5 opacity-50 small">
+            © 2026 PQRS Inteligente
+        </div>
     </div>
-    <p class="text-center text-muted small mt-3">
-      <i class="bi bi-shield-lock me-1"></i>Tus datos están protegidos bajo la
-      Ley 1581 de 2012.
-    </p>
-  </div>
+
+    <!-- ==========================================================
+         COLUMNA DERECHA - FORMULARIO DE LOGIN
+    ========================================================== -->
+    <div class="d-flex align-items-center justify-content-center p-4 p-md-5" style="flex: 1; background: var(--gris-suave);">
+        <div style="max-width: 400px; width: 100%;">
+
+            <!-- Encabezado móvil (visible solo en pantallas pequeñas) -->
+            <div class="d-lg-none text-center mb-4">
+                <i class="bi bi-shield-check text-primary" style="font-size: 2.5rem;"></i>
+                <h2 class="fw-bold mt-2" style="color: var(--azul-principal);">PQRS Inteligente</h2>
+            </div>
+
+            <h2 class="fw-bold mb-1" style="color: var(--azul-principal);">Iniciar sesión</h2>
+            <p class="text-muted small mb-4">Accede a tu cuenta para gestionar solicitudes</p>
+
+            <!-- Toggle de roles -->
+            <div class="d-flex bg-white rounded-2 p-1 mb-4 shadow-sm" style="border: 1px solid #e9ecef;">
+                <button type="button" id="toggleEmpresa" class="flex-fill py-2 rounded-2 border-0 fw-semibold" style="background: var(--azul-principal); color: white; transition: all 0.2s;">
+                    <i class="bi bi-building me-1"></i> Empresa
+                </button>
+                <button type="button" id="toggleCliente" class="flex-fill py-2 rounded-2 border-0 fw-semibold" style="background: transparent; color: #6c757d; transition: all 0.2s;">
+                    <i class="bi bi-person me-1"></i> Cliente
+                </button>
+            </div>
+
+            <!-- Formulario -->
+            <form method="POST" action="{% url 'usuarios:login' %}">
+                {% csrf_token %}
+
+                <!-- Mensajes de error -->
+                {% if form.errors %}
+                    <div class="alert alert-danger py-2 px-3 rounded-2 small" role="alert">
+                        <i class="bi bi-exclamation-triangle me-1"></i>
+                        {{ form.non_field_errors|default:"Usuario o contraseña incorrectos." }}
+                    </div>
+                {% endif %}
+
+                {% if error %}
+                    <div class="alert alert-danger py-2 px-3 rounded-2 small" role="alert">
+                        <i class="bi bi-exclamation-triangle me-1"></i>
+                        {{ error }}
+                    </div>
+                {% endif %}
+
+                <!-- Usuario -->
+                <div class="mb-3">
+                    <label class="form-label fw-semibold small">Usuario o correo</label>
+                    <input type="text" name="username" class="form-control form-control-lg" placeholder="usuario@empresa.com" required>
+                </div>
+
+                <!-- Contraseña -->
+                <div class="mb-3">
+                    <label class="form-label fw-semibold small">Contraseña</label>
+                    <div class="input-group">
+                        <input type="password" name="password" id="password" class="form-control form-control-lg" placeholder="••••••••" required>
+                        <button class="btn btn-outline-secondary" type="button" id="togglePassword">
+                            <i class="bi bi-eye" id="iconoOjo"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Recuperar contraseña -->
+                <div class="text-end mb-3">
+                    <a href="{% url 'password_reset' %}" class="text-decoration-none small" style="color: var(--azul-medio);">
+                        ¿Olvidaste tu contraseña?
+                    </a>
+                </div>
+
+                <!-- Botón Ingresar -->
+                <button type="submit" class="btn btn-primary w-100 py-3 fw-bold rounded-2 shadow-sm" style="background: linear-gradient(135deg, var(--azul-principal), var(--azul-medio)); border: none;">
+                    Ingresar
+                </button>
+            </form>
+
+            <!-- Registro -->
+            <p class="text-center text-muted small mt-4">
+                ¿No tienes cuenta?
+                <a href="{% url 'usuarios:registro_unificado' %}" class="fw-bold text-decoration-none" style="color: var(--azul-medio);">
+                    Regístrate gratis
+                </a>
+            </p>
+        </div>
+    </div>
 </div>
 
+<!-- ==========================================================
+     JAVASCRIPT PARA TOGGLE DE ROLES Y MOSTRAR CONTRASEÑA
+========================================================== -->
 <script>
-  document
-    .getElementById("togglePassword")
-    ?.addEventListener("click", function () {
-      const campo = document.getElementById("password");
-      const icono = document.getElementById("iconoOjo");
-      if (campo.type === "password") {
-        campo.type = "text";
-        icono.classList.remove("bi-eye");
-        icono.classList.add("bi-eye-slash");
-      } else {
-        campo.type = "password";
-        icono.classList.remove("bi-eye-slash");
-        icono.classList.add("bi-eye");
-      }
+    // Toggle de roles (solo visual, sin lógica de backend)
+    document.getElementById('toggleEmpresa')?.addEventListener('click', function() {
+        this.style.background = 'var(--azul-principal)';
+        this.style.color = 'white';
+        document.getElementById('toggleCliente').style.background = 'transparent';
+        document.getElementById('toggleCliente').style.color = '#6c757d';
+    });
+    document.getElementById('toggleCliente')?.addEventListener('click', function() {
+        this.style.background = 'var(--azul-principal)';
+        this.style.color = 'white';
+        document.getElementById('toggleEmpresa').style.background = 'transparent';
+        document.getElementById('toggleEmpresa').style.color = '#6c757d';
+    });
+
+    // Mostrar/ocultar contraseña
+    document.getElementById('togglePassword')?.addEventListener('click', function() {
+        const campo = document.getElementById('password');
+        const icono = document.getElementById('iconoOjo');
+        if (campo.type === 'password') {
+            campo.type = 'text';
+            icono.classList.remove('bi-eye');
+            icono.classList.add('bi-eye-slash');
+        } else {
+            campo.type = 'password';
+            icono.classList.remove('bi-eye-slash');
+            icono.classList.add('bi-eye');
+        }
     });
 </script>
 {% endblock %}
