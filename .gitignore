@@ -1,6 +1,4 @@
 .env
-db.sqlite3
-media/
 sent_emails/
 staticfiles/
 __pycache__/
