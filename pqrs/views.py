@@ -4,7 +4,6 @@ from django.db.models import Q
 from django.http import HttpResponse, FileResponse, Http404
 from django.views.decorators.cache import never_cache
 from django.contrib.auth.decorators import login_required
-from django.core.mail import send_mail
 from django.conf import settings
 from django.utils import timezone
 from .models import Pqrs, RespuestaPqrs, HistorialPQRS, ChatMensaje
@@ -16,30 +15,42 @@ from .classification_service import classify_text_zero_shot
 from .ia_service import chat_bot, analizar_sentimiento
 from django.views.decorators.clickjacking import xframe_options_exempt
 
-
 # ============================================================
 # FUNCIÓN AUXILIAR PARA ENVIAR CORREOS
 # ============================================================
 def enviar_notificacion(destinatario, asunto, mensaje):
-    """Envía un correo de notificación al destinatario."""
+    """Envía un correo de notificación usando la API de SendGrid."""
 
     if not destinatario:
         return
 
     try:
-        send_mail(
-            subject=asunto,
-            message=mensaje,
+        from sendgrid import SendGridAPIClient
+        from sendgrid.helpers.mail import Mail
+
+        email = Mail(
             from_email=settings.DEFAULT_FROM_EMAIL,
-            recipient_list=[destinatario],
-            fail_silently=False,
+            to_emails=destinatario,
+            subject=asunto,
+            plain_text_content=mensaje,
         )
 
-        print(f"[CORREO] Enviado a {destinatario}")
+        sg = SendGridAPIClient(settings.SENDGRID_API_KEY)
+        response = sg.send(email)
+
+        if 200 <= response.status_code < 300:
+            print(f"[CORREO] Enviado a {destinatario}")
+        else:
+            print(
+                f"[ERROR] SendGrid respondió con "
+                f"status {response.status_code}"
+            )
 
     except Exception as e:
-        print(f"[ERROR] No se pudo enviar correo a {destinatario}: {e}")
-
+        print(
+            f"[ERROR] No se pudo enviar correo a "
+            f"{destinatario}: {e}"
+        )
 
 # ============================================================
 # CREAR PQRS
