@@ -1,3 +1,4 @@
+
 """
 Configuración del proyecto PQRS-INTELIGENTE
 Django - Proyecto Final SENA Cúcuta 2026
@@ -29,6 +30,17 @@ ALLOWED_HOSTS = [
     for host in os.getenv("ALLOWED_HOSTS", "localhost,127.0.0.1").split(",")
     if host.strip()
 ]
+
+# ============================================================
+# URL PRINCIPAL DEL SITIO
+# ============================================================
+# En local usa http://127.0.0.1:8000
+# En Render se configura mediante la variable SITE_URL
+
+SITE_URL = os.getenv(
+    "SITE_URL",
+    "http://127.0.0.1:8000"
+)
 
 
 # ============================================================
@@ -141,6 +153,7 @@ STATIC_URL = "/static/"
 
 STATIC_ROOT = BASE_DIR / "staticfiles"
 
+
 # ============================================================
 # ARCHIVOS MEDIA (Cloudinary)
 # ============================================================
@@ -169,7 +182,9 @@ if DEBUG:
     MEDIA_URL = "/media/"
     MEDIA_ROOT = BASE_DIR / "media"
 
+
 DATA_UPLOAD_MAX_MEMORY_SIZE = 5242880
+
 
 # ============================================================
 # AUTENTICACIÓN Y REDIRECCIONES
@@ -227,4 +242,7 @@ EPAYCO_LANG = os.getenv("EPAYCO_LANG", "ES")
 
 SENDGRID_API_KEY = os.getenv("SENDGRID_API_KEY")
 
-DEFAULT_FROM_EMAIL = os.getenv("DEFAULT_FROM_EMAIL", "aresjq21@gmail.com")
+DEFAULT_FROM_EMAIL = os.getenv(
+    "DEFAULT_FROM_EMAIL",
+    "aresjq21@gmail.com"
+)
