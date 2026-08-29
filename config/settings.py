@@ -50,6 +50,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 
     # Apps del proyecto
+    'cloudinary',
+    'cloudinary_storage',
     'core',
     'empresas',
     'pqrs',
@@ -156,17 +158,30 @@ STATIC_URL = '/static/'
 
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 
-
 # ============================================================
-# ARCHIVOS MEDIA
+# ARCHIVOS MEDIA (Cloudinary)
 # ============================================================
 
-MEDIA_URL = '/media/'
+CLOUDINARY_STORAGE = {
+    'CLOUD_NAME': os.getenv('CLOUDINARY_CLOUD_NAME'),
+    'API_KEY': os.getenv('CLOUDINARY_API_KEY'),
+    'API_SECRET': os.getenv('CLOUDINARY_API_SECRET'),
+}
 
-MEDIA_ROOT = BASE_DIR / 'media'
+# Usa Cloudinary en producción, almacenamiento local en desarrollo
+if not DEBUG:
+
+    DEFAULT_FILE_STORAGE = (
+        'cloudinary_storage.storage.MediaCloudinaryStorage'
+    )
+
+else:
+
+    # Desarrollo local
+    MEDIA_URL = '/media/'
+    MEDIA_ROOT = BASE_DIR / 'media'
 
 DATA_UPLOAD_MAX_MEMORY_SIZE = 5242880
-
 
 # ============================================================
 # AUTENTICACIÓN Y REDIRECCIONES
