@@ -15,6 +15,7 @@ from .classification_service import classify_text_zero_shot
 from .ia_service import chat_bot, analizar_sentimiento
 from django.views.decorators.clickjacking import xframe_options_exempt
 
+
 # ============================================================
 # FUNCIÓN AUXILIAR PARA ENVIAR CORREOS
 # ============================================================
@@ -51,6 +52,7 @@ def enviar_notificacion(destinatario, asunto, mensaje):
             f"[ERROR] No se pudo enviar correo a "
             f"{destinatario}: {e}"
         )
+
 
 # ============================================================
 # CREAR PQRS
@@ -121,7 +123,7 @@ def crear_pqrs(request):
             )
 
         # ============================================================
-        # ANÁLISIS DE SENTIMIENTOS  ( El place holder puede adaptarse a cualquier función a futuro de la empresa)
+        # ANÁLISIS DE SENTIMIENTOS
         # ============================================================
         sentimiento = analizar_sentimiento(descripcion)
 
@@ -248,6 +250,7 @@ def dashboard(request):
         )
 
     if estado:
+
         queryset = queryset.filter(
             estado=estado
         )
@@ -331,9 +334,14 @@ def detalle_pqrs(request, pqrs_id):
     if not request.user.is_authenticated:
         return redirect('usuarios:login')
 
-    pqrs = get_object_or_404(Pqrs, id=pqrs_id)
+    pqrs = get_object_or_404(
+        Pqrs,
+        id=pqrs_id
+    )
 
-    respuestas = pqrs.respuestas.all().order_by('fecha_respuesta')
+    respuestas = pqrs.respuestas.all().order_by(
+        'fecha_respuesta'
+    )
 
     perfil = request.user.perfil
 
@@ -342,12 +350,26 @@ def detalle_pqrs(request, pqrs_id):
     # ============================================================
 
     if perfil.rol == 'cliente' and pqrs.id_usuario_creador != request.user:
-        messages.error(request, 'No tienes permiso')
-        return redirect('pqrs:mis_solicitudes')
+
+        messages.error(
+            request,
+            'No tienes permiso'
+        )
+
+        return redirect(
+            'pqrs:mis_solicitudes'
+        )
 
     if perfil.rol == 'empresa' and pqrs.id_empresa != perfil.empresa:
-        messages.error(request, 'No tienes permiso')
-        return redirect('pqrs:dashboard')
+
+        messages.error(
+            request,
+            'No tienes permiso'
+        )
+
+        return redirect(
+            'pqrs:dashboard'
+        )
 
     # ============================================================
     # PROCESAR RESPUESTA / CAMBIO DE ESTADO
@@ -372,9 +394,17 @@ def detalle_pqrs(request, pqrs_id):
                 pqrs_id=pqrs.id
             )
 
-        texto = request.POST.get('respuesta')
-        nuevo_estado = request.POST.get('estado')
-        archivo = request.FILES.get('archivo')
+        texto = request.POST.get(
+            'respuesta'
+        )
+
+        nuevo_estado = request.POST.get(
+            'estado'
+        )
+
+        archivo = request.FILES.get(
+            'archivo'
+        )
 
         estado_anterior = pqrs.estado
 
@@ -395,6 +425,7 @@ def detalle_pqrs(request, pqrs_id):
             # ====================================================
 
             if archivo:
+
                 respuesta.archivo = archivo
                 respuesta.save()
 
@@ -411,23 +442,77 @@ def detalle_pqrs(request, pqrs_id):
             )
 
             # ====================================================
-            # NOTIFICACIÓN POR CORREO AL CLIENTE
+            # NOTIFICACIÓN POR CORREO
+            #
+            # AQUÍ ESTÁ EL CAMBIO PRINCIPAL
+            #
+            # Si responde CLIENTE:
+            #       → enviar a EMPRESA
+            #
+            # Si responde EMPRESA:
+            #       → enviar al CLIENTE
             # ====================================================
 
-            if pqrs.id_usuario_creador.email:
+            if perfil.rol == 'cliente':
 
-                enviar_notificacion(
-                    destinatario=pqrs.id_usuario_creador.email,
-                    asunto=f"Respuesta a tu PQRS - {pqrs.codigo_radicado}",
-                    mensaje=(
-                        f"Tu PQRS con radicado "
-                        f"{pqrs.codigo_radicado} ha recibido una respuesta.\n\n"
-                        f"La empresa "
-                        f"{pqrs.id_empresa.nombre_empresa} ha respondido:\n"
-                        f"{texto}\n\n"
-                        f"Puedes ver el detalle en tus solicitudes."
-                    )
+                # ------------------------------------------------
+                # CLIENTE RESPONDE
+                # → NOTIFICAR A LA EMPRESA
+                # ------------------------------------------------
+
+                usuarios_empresa = PerfilUsuario.objects.filter(
+                    empresa=pqrs.id_empresa,
+                    rol='empresa'
                 )
+
+                for perfil_emp in usuarios_empresa:
+
+                    if perfil_emp.usuario.email:
+
+                        enviar_notificacion(
+                            destinatario=perfil_emp.usuario.email,
+                            asunto=(
+                                f"Nuevo mensaje del cliente - "
+                                f"{pqrs.codigo_radicado}"
+                            ),
+                            mensaje=(
+                                f"El cliente ha respondido la PQRS "
+                                f"con radicado "
+                                f"{pqrs.codigo_radicado}.\n\n"
+                                f"Asunto: {pqrs.asunto}\n\n"
+                                f"Respuesta del cliente:\n"
+                                f"{texto}\n\n"
+                                f"Puedes consultar y responder la PQRS "
+                                f"desde el dashboard."
+                            )
+                        )
+
+            elif perfil.rol == 'empresa':
+
+                # ------------------------------------------------
+                # EMPRESA RESPONDE
+                # → NOTIFICAR AL CLIENTE
+                # ------------------------------------------------
+
+                if pqrs.id_usuario_creador.email:
+
+                    enviar_notificacion(
+                        destinatario=pqrs.id_usuario_creador.email,
+                        asunto=(
+                            f"Respuesta a tu PQRS - "
+                            f"{pqrs.codigo_radicado}"
+                        ),
+                        mensaje=(
+                            f"Tu PQRS con radicado "
+                            f"{pqrs.codigo_radicado} "
+                            f"ha recibido una respuesta.\n\n"
+                            f"La empresa "
+                            f"{pqrs.id_empresa.nombre_empresa} "
+                            f"ha respondido:\n"
+                            f"{texto}\n\n"
+                            f"Puedes ver el detalle en tus solicitudes."
+                        )
+                    )
 
         # ========================================================
         # CAMBIAR ESTADO
@@ -531,9 +616,13 @@ def detalle_pqrs(request, pqrs_id):
         # DÍAS TRANSCURRIDOS
         # ========================================================
 
-        dias = int(horas // 24)
+        dias = int(
+            horas // 24
+        )
 
-        horas_extra = int(horas % 24)
+        horas_extra = int(
+            horas % 24
+        )
 
         # ========================================================
         # TIEMPO RESTANTE
@@ -558,7 +647,9 @@ def detalle_pqrs(request, pqrs_id):
 
         porcentaje = min(
             100,
-            int((horas / SLA_HORAS) * 100)
+            int(
+                (horas / SLA_HORAS) * 100
+            )
         )
 
         # ========================================================
@@ -620,6 +711,7 @@ def detalle_pqrs(request, pqrs_id):
         'pqrs/detalle.html',
         context
     )
+
 
 # ============================================================
 # MIS SOLICITUDES
@@ -690,12 +782,14 @@ def descargar_archivo(request, pqrs_id):
         perfil.rol == 'cliente'
         and pqrs.id_usuario_creador != request.user
     ):
+
         raise Http404
 
     if (
         perfil.rol == 'empresa'
         and pqrs.id_empresa != perfil.empresa
     ):
+
         raise Http404
 
     return FileResponse(
