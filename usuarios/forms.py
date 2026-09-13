@@ -2,6 +2,7 @@ from django import forms
 from django.contrib.auth.models import User
 from django.contrib.auth.forms import PasswordChangeForm
 from empresas.models import Empresa, Plan
+from .models import PerfilUsuario
 
 # ============================================================
 # REGISTRO UNIFICADO (PLACEHOLDERS AGREGADOS)
@@ -65,13 +66,19 @@ class RegistroUnificadoForm(forms.Form):
             'placeholder': 'Ingresa tus apellidos'
         })
     )
-    cedula = forms.CharField(
+    tipo_documento = forms.ChoiceField(
+        choices=PerfilUsuario.TIPO_DOCUMENTO_CHOICES,
+        initial='CC',
+        label="Tipo de documento",
+        widget=forms.Select(attrs={'class': 'form-select'})
+    )
+    numero_documento = forms.CharField(
         max_length=20,
         required=False,
-        label="Cédula",
+        label="Número de documento",
         widget=forms.TextInput(attrs={
             'class': 'form-control',
-            'placeholder': 'Número de cédula'
+            'placeholder': 'Ingresa el número de documento'
         })
     )
     
@@ -162,11 +169,20 @@ class EditarPerfilForm(forms.ModelForm):
         label="Apellidos",
         widget=forms.TextInput(attrs={'class': 'form-control form-control-lg', 'placeholder': 'Ingresa tus apellidos'})
     )
-    cedula = forms.CharField(
+    tipo_documento = forms.ChoiceField(
+        choices=PerfilUsuario.TIPO_DOCUMENTO_CHOICES,
+        initial='CC',
+        label="Tipo de documento",
+        widget=forms.Select(attrs={'class': 'form-select'})
+    )
+    numero_documento = forms.CharField(
         max_length=20,
         required=False,
-        label="Cédula",
-        widget=forms.TextInput(attrs={'class': 'form-control form-control-lg', 'placeholder': 'Número de cédula'})
+        label="Número de documento",
+        widget=forms.TextInput(attrs={
+            'class': 'form-control form-control-lg',
+            'placeholder': 'Ingresa el número de documento'
+        })
     )
     telefono = forms.CharField(
         max_length=15,
@@ -191,12 +207,15 @@ class EditarPerfilForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+
         if self.instance and hasattr(self.instance, 'perfil'):
             perfil = self.instance.perfil
-            self.fields['nombres'].initial = perfil.nombres if perfil.nombres else ''
-            self.fields['apellidos'].initial = perfil.apellidos if perfil.apellidos else ''
-            self.fields['cedula'].initial = perfil.cedula if perfil.cedula else ''
-            self.fields['telefono'].initial = perfil.telefono if perfil.telefono else ''
+
+            self.fields['nombres'].initial = perfil.nombres or ''
+            self.fields['apellidos'].initial = perfil.apellidos or ''
+            self.fields['tipo_documento'].initial = perfil.tipo_documento or 'CC'
+            self.fields['numero_documento'].initial = perfil.numero_documento or ''
+            self.fields['telefono'].initial = perfil.telefono or ''
 
     def clean_foto(self):
         foto = self.cleaned_data.get('foto')
@@ -220,18 +239,26 @@ class EditarPerfilForm(forms.ModelForm):
 
     def save(self, commit=True):
         user = super().save(commit=False)
+
         if commit:
             user.save()
+
             perfil = user.perfil
+
             perfil.nombres = self.cleaned_data.get('nombres')
             perfil.apellidos = self.cleaned_data.get('apellidos')
-            perfil.cedula = self.cleaned_data.get('cedula')
+            perfil.tipo_documento = self.cleaned_data.get('tipo_documento')
+            perfil.numero_documento = self.cleaned_data.get('numero_documento')
             perfil.telefono = self.cleaned_data.get('telefono')
+
             if self.cleaned_data.get('foto'):
                 perfil.foto = self.cleaned_data['foto']
+
             if self.cleaned_data.get('logo'):
                 perfil.logo = self.cleaned_data['logo']
+
             perfil.save()
+
         return user
 
 

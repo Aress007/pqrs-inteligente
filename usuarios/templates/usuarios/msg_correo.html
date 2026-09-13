@@ -1,17 +1,310 @@
 {% load static %}
 <!DOCTYPE html>
-<html>
+<html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Recuperación de contraseña</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recuperación de contraseña - PQRS Inteligente</title>
+
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #f4f6fb;
+            font-family: Arial, Helvetica, sans-serif;
+            color: #333333;
+        }
+
+        .wrapper {
+            width: 100%;
+            padding: 30px 0;
+            background-color: #f4f6fb;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #ffffff;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.10);
+        }
+
+        .header {
+            background: linear-gradient(
+                135deg,
+                #0d1f3c 0%,
+                #1a3a6b 50%,
+                #2756a8 100%
+            );
+            padding: 35px 25px;
+            text-align: center;
+        }
+
+        .logo {
+            display: inline-block;
+            background-color: rgba(255, 255, 255, 0.15);
+            padding: 10px 20px;
+            border-radius: 10px;
+            color: #ffffff;
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+
+        .header h1 {
+            margin: 0;
+            color: #ffffff;
+            font-size: 25px;
+        }
+
+        .header p {
+            margin: 8px 0 0;
+            color: rgba(255, 255, 255, 0.85);
+            font-size: 14px;
+        }
+
+        .content {
+            padding: 35px 30px;
+        }
+
+        .content h2 {
+            margin-top: 0;
+            color: #1a3a6b;
+            font-size: 21px;
+        }
+
+        .content p {
+            font-size: 15px;
+            line-height: 1.6;
+            color: #444444;
+        }
+
+        .info-box {
+            background-color: #f4f6fb;
+            border-left: 4px solid #2756a8;
+            border-radius: 8px;
+            padding: 15px 18px;
+            margin: 25px 0;
+        }
+
+        .info-box strong {
+            color: #1a3a6b;
+        }
+
+        .button-container {
+            text-align: center;
+            margin: 30px 0;
+        }
+
+        .button {
+            display: inline-block;
+            background-color: #1a3a6b;
+            color: #ffffff !important;
+            text-decoration: none;
+            padding: 14px 30px;
+            border-radius: 30px;
+            font-size: 15px;
+            font-weight: bold;
+        }
+
+        .button:hover {
+            background-color: #2756a8;
+        }
+
+        .url-box {
+            background-color: #f8f9fa;
+            border: 1px solid #e1e5eb;
+            border-radius: 8px;
+            padding: 12px;
+            word-break: break-all;
+            font-size: 12px;
+            color: #666666;
+        }
+
+        .warning {
+            background-color: #fff8e6;
+            border-left: 4px solid #f59e0b;
+            padding: 15px 18px;
+            border-radius: 8px;
+            margin-top: 25px;
+        }
+
+        .warning p {
+            margin: 0;
+            font-size: 13px;
+            color: #665522;
+        }
+
+        .divider {
+            height: 1px;
+            background-color: #e9ecef;
+            margin: 25px 0;
+        }
+
+        .footer {
+            background-color: #f4f6fb;
+            padding: 22px 25px;
+            text-align: center;
+            border-top: 1px solid #dee2e6;
+        }
+
+        .footer p {
+            margin: 5px 0;
+            font-size: 12px;
+            line-height: 1.5;
+            color: #6c757d;
+        }
+
+        .footer strong {
+            color: #1a3a6b;
+        }
+
+        @media only screen and (max-width: 600px) {
+            .wrapper {
+                padding: 10px 0;
+            }
+
+            .container {
+                width: 95%;
+            }
+
+            .content {
+                padding: 25px 20px;
+            }
+
+            .header {
+                padding: 28px 20px;
+            }
+        }
+    </style>
 </head>
+
 <body>
-    <h2>Hola {{ username }}</h2>
-    <p>Recibimos una solicitud para restablecer la contraseña de tu cuenta en <strong>{{ site_name }}</strong>.</p>
-    <p>Haz clic en el siguiente enlace para cambiar tu contraseña:</p>
-    <p><a href="{{ reset_url }}">{{ reset_url }}</a></p>
-    <p>Este enlace es válido por 1 hora.</p>
-    <p>Si no solicitaste este cambio, ignora este mensaje.</p>
-    <p>Saludos,<br>El equipo de {{ site_name }}</p>
+
+<div class="wrapper">
+
+    <div class="container">
+
+        <!-- ENCABEZADO -->
+        <div class="header">
+
+            <div class="logo">
+                🛡️ PQRS Inteligente
+            </div>
+
+            <h1>Recuperación de contraseña</h1>
+
+            <p>
+                Sistema de Gestión de PQRS con Inteligencia Artificial
+            </p>
+
+        </div>
+
+
+        <!-- CONTENIDO -->
+        <div class="content">
+
+            <h2>Hola {{ username }} 👋</h2>
+
+            <p>
+                Recibimos una solicitud para restablecer la contraseña
+                de tu cuenta en <strong>{{ site_name }}</strong>.
+            </p>
+
+            <p>
+                Para continuar y crear una nueva contraseña,
+                haz clic en el siguiente botón:
+            </p>
+
+
+            <!-- BOTÓN -->
+            <div class="button-container">
+
+                <a href="{{ reset_url }}" class="button">
+                    🔐 Restablecer mi contraseña
+                </a>
+
+            </div>
+
+
+            <!-- INFORMACIÓN -->
+            <div class="info-box">
+
+                <strong>⏱️ Importante</strong>
+
+                <p style="margin-bottom: 0;">
+                    Este enlace es válido durante
+                    <strong>1 hora</strong>.
+                    Después de ese tiempo tendrás que solicitar
+                    un nuevo enlace de recuperación.
+                </p>
+
+            </div>
+
+
+            <p>
+                Si el botón anterior no funciona, puedes copiar y pegar
+                el siguiente enlace directamente en tu navegador:
+            </p>
+
+
+            <!-- URL -->
+            <div class="url-box">
+                {{ reset_url }}
+            </div>
+
+
+            <!-- ADVERTENCIA -->
+            <div class="warning">
+
+                <p>
+                    🔒 <strong>¿No solicitaste este cambio?</strong><br>
+                    Si tú no solicitaste recuperar tu contraseña,
+                    puedes ignorar este mensaje. Tu contraseña actual
+                    seguirá siendo válida.
+                </p>
+
+            </div>
+
+
+            <div class="divider"></div>
+
+
+            <p>
+                Gracias por utilizar <strong>{{ site_name }}</strong>.
+            </p>
+
+            <p>
+                Saludos,<br>
+                <strong>El equipo de PQRS Inteligente</strong>
+            </p>
+
+        </div>
+
+
+        <!-- PIE DE CORREO -->
+        <div class="footer">
+
+            <p>
+                <strong>PQRS Inteligente</strong> —
+                Proyecto SENA Cúcuta 2026
+            </p>
+
+            <p>
+                Este es un mensaje automático.
+                Por favor, no respondas directamente a este correo.
+            </p>
+
+            <p>
+                © 2026 Todos los derechos reservados.
+            </p>
+
+        </div>
+
+    </div>
+
+</div>
+
 </body>
 </html>

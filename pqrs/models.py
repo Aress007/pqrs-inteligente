@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
 from empresas.models import Empresa
+from core.validators import validate_file_extension
 
 
 class Pqrs(models.Model):
@@ -56,14 +57,8 @@ class Pqrs(models.Model):
         upload_to='pqrs_adjuntos/',
         blank=True,
         null=True,
-        verbose_name="Archivo adjunto"
-    )
-
-    sentimiento = models.CharField(
-        max_length=20,
-        default='neutral',
-        blank=True,
-        verbose_name="Sentimiento detectado"
+        verbose_name="Archivo adjunto",
+        validators=[validate_file_extension]
     )
 
     id_usuario_creador = models.ForeignKey(
@@ -105,7 +100,8 @@ class RespuestaPqrs(models.Model):
         upload_to='respuestas_adjuntos/',
         blank=True,
         null=True,
-        verbose_name="Archivo adjunto en respuesta"
+        verbose_name="Archivo adjunto en respuesta",
+        validators=[validate_file_extension]
     )
 
     fecha_respuesta = models.DateTimeField(

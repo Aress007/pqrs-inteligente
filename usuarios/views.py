@@ -47,15 +47,12 @@ def eliminar_archivo_si_existe(ruta):
 def enviar_correo_sendgrid(
     destinatario,
     asunto,
-    mensaje_html=None,
-    mensaje_texto=None
+    context=None,
+    template_name='usuarios/email_notificacion.html'
 ):
     """
-    Envía correos utilizando la API de SendGrid.
-
-    Se utiliza tanto para:
-    - Notificaciones
-    - Recuperación de contraseña
+    Envía correos utilizando la API de SendGrid
+    utilizando una plantilla HTML de Django.
     """
 
     if not destinatario:
@@ -70,28 +67,34 @@ def enviar_correo_sendgrid(
         from sendgrid import SendGridAPIClient
         from sendgrid.helpers.mail import Mail
 
-        if not mensaje_texto and mensaje_html:
-            mensaje_texto = strip_tags(mensaje_html)
+        context = context or {}
 
-        if not mensaje_html:
-            mensaje_html = mensaje_texto or ""
+        html_content = render_to_string(
+            template_name,
+            context
+        )
+
+        text_content = strip_tags(html_content)
 
         email = Mail(
             from_email=settings.DEFAULT_FROM_EMAIL,
             to_emails=destinatario,
             subject=asunto,
-            plain_text_content=mensaje_texto or "",
-            html_content=mensaje_html,
+            plain_text_content=text_content,
+            html_content=html_content,
         )
 
-        sg = SendGridAPIClient(settings.SENDGRID_API_KEY)
+        sg = SendGridAPIClient(
+            settings.SENDGRID_API_KEY
+        )
 
         response = sg.send(email)
 
         if 200 <= response.status_code < 300:
 
             print(
-                f"[CORREO] Enviado correctamente a {destinatario} "
+                f"[CORREO] Enviado correctamente a "
+                f"{destinatario} "
                 f"(SendGrid {response.status_code})"
             )
 
@@ -112,8 +115,6 @@ def enviar_correo_sendgrid(
         )
 
         return False
-
-
 # ============================================================
 # LOGIN
 # ============================================================
@@ -137,14 +138,19 @@ def login_view(request):
 
     if request.method == "POST":
 
-        username = request.POST.get("username")
+        username_or_email = request.POST.get("username")
         password = request.POST.get("password")
 
-        user = authenticate(
-            request,
-            username=username,
-            password=password
-        )
+        # Intentar autenticar con username
+        user = authenticate(request, username=username_or_email, password=password)
+
+        # Si falla, buscar por email
+        if user is None:
+            try:
+                user_obj = User.objects.get(email=username_or_email)
+                user = authenticate(request, username=user_obj.username, password=password)
+            except User.DoesNotExist:
+                user = None
 
         if user is not None:
 
@@ -293,6 +299,10 @@ def registro_unificado(request):
                     empresa=empresa,
                     telefono=telefono,
                     rol="empresa",
+                    nombres=form.cleaned_data.get("nombres", ""),
+                    apellidos=form.cleaned_data.get("apellidos", ""),
+                    tipo_documento=form.cleaned_data.get("tipo_documento", "CC"),
+                    numero_documento=form.cleaned_data.get("numero_documento", ""),
                 )
 
                 messages.success(
@@ -343,6 +353,10 @@ def registro_unificado(request):
                     telefono=telefono,
                     rol="cliente",
                     empresa=None,
+                    nombres=form.cleaned_data.get("nombres", ""),
+                    apellidos=form.cleaned_data.get("apellidos", ""),
+                    tipo_documento=form.cleaned_data.get("tipo_documento", "CC"),
+                    numero_documento=form.cleaned_data.get("numero_documento", ""),
                 )
 
                 messages.success(
@@ -482,6 +496,66 @@ def editar_perfil(request):
             instance=request.user
         )
 
+        # ====================================================
+        # VALIDAR EXTENSIÓN DE FOTO
+        # ====================================================
+
+        if request.FILES.get('foto'):
+
+            archivo = request.FILES['foto']
+
+            ext = os.path.splitext(
+                archivo.name
+            )[1].lower()
+
+            valid_extensions = [
+                '.jpg',
+                '.jpeg',
+                '.png'
+            ]
+
+            if ext not in valid_extensions:
+
+                messages.error(
+                    request,
+                    'Formato no permitido para la foto.'
+                )
+
+                return redirect(
+                    'usuarios:editar_perfil'
+                )
+
+
+        # ====================================================
+        # VALIDAR EXTENSIÓN DE LOGO
+        # ====================================================
+
+        if request.FILES.get('logo'):
+
+            archivo = request.FILES['logo']
+
+            ext = os.path.splitext(
+                archivo.name
+            )[1].lower()
+
+            valid_extensions = [
+                '.jpg',
+                '.jpeg',
+                '.png'
+            ]
+
+            if ext not in valid_extensions:
+
+                messages.error(
+                    request,
+                    'Formato no permitido para el logo.'
+                )
+
+                return redirect(
+                    'usuarios:editar_perfil'
+                )
+
+
         if form.is_valid():
 
             form.save()
@@ -502,7 +576,6 @@ def editar_perfil(request):
                 return redirect(
                     "pqrs:mis_solicitudes"
                 )
-
         else:
 
             print(
@@ -721,36 +794,18 @@ def recuperar_contraseña(request):
         )
 
         # ====================================================
-        # CREAR CORREO HTML
-        # ====================================================
-
-        html_message = render_to_string(
-            "usuarios/msg_correo.html",
-            {
-                "username": user.username,
-                "reset_url": reset_url,
-                "site_name": "PQRS Inteligente",
-            }
-        )
-
-        text_message = strip_tags(
-            html_message
-        )
-
-        subject = (
-            "Recuperación de contraseña - "
-            "PQRS Inteligente"
-        )
-
-        # ====================================================
         # ENVIAR CON SENDGRID
         # ====================================================
 
         enviado = enviar_correo_sendgrid(
             destinatario=email,
-            asunto=subject,
-            mensaje_html=html_message,
-            mensaje_texto=text_message,
+            asunto="Recuperación de contraseña - PQRS Inteligente",
+            context={
+                "username": user.username,
+                "reset_url": reset_url,
+                "site_name": "PQRS Inteligente",
+            },
+            template_name="usuarios/msg_correo.html",
         )
 
         if enviado:

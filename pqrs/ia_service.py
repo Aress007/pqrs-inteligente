@@ -185,26 +185,3 @@ def _chatbot_fallback_local(mensaje_usuario):
         return random.choice(respuestas['crear'])
     else:
         return "No entendí tu mensaje. Puedes preguntarme sobre: estado de PQRS, cómo crear una PQRS, o simplemente saludarme."
-
-
-# ============================================================
-# ANÁLISIS DE SENTIMIENTOS LOCAL (por palabras clave) ( El place holder puede adaptarse a cualquier función a futuro de la empresa)
-# ============================================================
-def analizar_sentimiento(texto):
-    """
-    Analiza el sentimiento de un texto usando palabras clave.
-    Retorna: 'positivo', 'negativo', 'neutral'.
-    """
-    t = texto.lower()
-    positivas = ['excelente', 'buen', 'buena', 'bien', 'perfecto', 'genial', 'maravilloso', 'fantástico', 'satisfecho', 'agradecido', 'recomiendo']
-    negativas = ['malo', 'mala', 'pésimo', 'terrible', 'horrible', 'decepcionado', 'insatisfecho', 'problema', 'error', 'falla', 'dañado', 'roto', 'demora', 'grosero']
-    
-    pos_count = sum(1 for p in positivas if p in t)
-    neg_count = sum(1 for p in negativas if p in t)
-    
-    if pos_count > neg_count:
-        return 'positivo'
-    elif neg_count > pos_count:
-        return 'negativo'
-    else:
-        return 'neutral'

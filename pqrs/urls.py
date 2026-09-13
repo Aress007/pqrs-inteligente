@@ -12,4 +12,6 @@ urlpatterns = [
     path("respuesta/editar/<int:respuesta_id>/", views.editar_respuesta, name="editar_respuesta",),
     path("respuesta/eliminar/<int:respuesta_id>/", views.eliminar_respuesta, name="eliminar_respuesta",),
     path('chatbot/', views.chatbot_view, name='chatbot'),
+    path('reporte/pdf/<int:pqrs_id>/', views.generar_reporte_pdf, name='reporte_pdf'),
+    path('reporte/pdf/', views.generar_reporte_pdf, name='reporte_pdf_todas'),
 ]

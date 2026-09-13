@@ -13,7 +13,7 @@ import requests
 # ============================================================
 # Obtener el token en: https://huggingface.co/settings/tokens
 HF_TOKEN = os.getenv("HF_TOKEN", "")  # variable definida en Render
-API_URL = "https://router.huggingface.co/hf-inference/models/facebook/bart-large-mnli"  # Modelo zero-shot
+API_URL = "https://router.huggingface.co/hf-inference/models/facebook/bart-large-mnli"  # Endpoint Modelo zero-shot
 HEADERS = {"Authorization": f"Bearer {HF_TOKEN}"} if HF_TOKEN else {}
 
 # Etiquetas para clasificación

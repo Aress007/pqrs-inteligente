@@ -48,26 +48,34 @@
                         </div>
 
                         <!-- Información personal -->
-                        <h5 class="fw-bold mt-4" style="color: var(--azul-principal);">
-                            <i class="bi bi-person-badge me-2"></i>Información personal
-                        </h5>
-                        <div class="row g-3 mb-4">
-                            <div class="col-md-6">
-                                <label class="form-label fw-semibold">Nombres</label>
-                                {{ user_form.nombres }}
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label fw-semibold">Apellidos</label>
-                                {{ user_form.apellidos }}
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label fw-semibold">Cédula</label>
-                                {{ user_form.cedula }}
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label fw-semibold">Teléfono</label>
-                                {{ user_form.telefono }}
-                            </div>
+                        <h5 class="fw-bold mt-4" style="color: var(--azul-principal);"> <i class="bi bi-person-badge me-2"></i>Información personal </h5>
+
+                        <div class="row g-3 mb-4"> <div class="col-md-6"> <label class="form-label fw-semibold">Nombres</label> {{ user_form.nombres }} {{ user_form.nombres.errors }} </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Apellidos</label>
+                            {{ user_form.apellidos }}
+                            {{ user_form.apellidos.errors }}
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Tipo de documento</label>
+                            {{ user_form.tipo_documento }}
+                            {{ user_form.tipo_documento.errors }}
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Número de documento</label>
+                            {{ user_form.numero_documento }}
+                            {{ user_form.numero_documento.errors }}
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Teléfono</label>
+                            {{ user_form.telefono }}
+                            {{ user_form.telefono.errors }}
+                        </div>
+
                         </div>
 
                         <!-- Imagen de perfil -->

@@ -6,10 +6,9 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
+    
     dependencies = [
-        ('pqrs', '0005_pqrs_sentimiento'),
-        migrations.swappable_dependency(settings.AUTH_USER_MODEL),
+        ('pqrs', '0004_historialpqrs'),
     ]
 
     operations = [
